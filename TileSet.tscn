@@ -155,4 +155,36 @@ centered = false
 region = true
 region_rect = Rect2( 48, 48, 16, 16 )
 
+[node name="exit_12" type="Sprite" parent="."]
+
+transform/pos = Vector2( 0, 64 )
+texture = ExtResource( 1 )
+centered = false
+region = true
+region_rect = Rect2( 0, 64, 16, 16 )
+
+[node name="exit_05" type="Sprite" parent="."]
+
+transform/pos = Vector2( 16, 64 )
+texture = ExtResource( 1 )
+centered = false
+region = true
+region_rect = Rect2( 16, 64, 16, 16 )
+
+[node name="exit_10" type="Sprite" parent="."]
+
+transform/pos = Vector2( 32, 64 )
+texture = ExtResource( 1 )
+centered = false
+region = true
+region_rect = Rect2( 32, 64, 16, 16 )
+
+[node name="exit_03" type="Sprite" parent="."]
+
+transform/pos = Vector2( 48, 64 )
+texture = ExtResource( 1 )
+centered = false
+region = true
+region_rect = Rect2( 48, 64, 16, 16 )
+
 

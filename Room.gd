@@ -5,9 +5,6 @@ var tile_size
 var room_size
 
 var base_map
-var base_vertices = []
-var base_vert_min
-var base_vert_max
 
 func init_map():
 	var map = TileMap.new()
@@ -28,63 +25,46 @@ func _init(resource):
 	self.generate_content()
 
 func generate_content():
-	self.basic_perlin_fill()
-	self.set_tiles_from_vertices()
+	self.room_create()
 
-func basic_perlin_fill():
-	var min_b1 = 0
-	var max_b1 = 0
-	
-	for corner_x in range(self.room_size.x + 1):
-		self.base_vertices.append([])
-		for corner_y in range(self.room_size.y + 1):
-			var b1 = resource.base_fbm.fractal2d(3, 1.2, corner_x, corner_y, 0, 8)
-			min_b1 = min(min_b1, b1)
-			max_b1 = max(max_b1, b1)
-			self.base_vertices[corner_x].append(b1)
-	
-	print ("min_b1 = " + str(min_b1))
-	print ("max_b1 = " + str(max_b1))
-	
-	self.base_vert_min = min_b1
-	self.base_vert_max = max_b1
+func room_create():
+	for tile_y in range(self.room_size.y):
+		for tile_x in range(self.room_size.x):
+			# Start with no walls
+			self.base_map.set_cell(tile_x, tile_y, resource.walls[0])
+	var border = Rect2(0,0,self.room_size.x - 1,self.room_size.y - 1)
+	for bounds in random_rect_breakdown(border):
+		var dropped = (randi()%2 == 0)
+		draw_rect_feature(self.base_map, bounds, dropped)
 
-func set_tiles_from_vertices():
-	var total_cells_set = 0
-	for limit in [(self.base_vert_min / 2), 0, (self.base_vert_max / 2), 1]:
-		print ("limit = " + str(limit))
-		var cells_set = 0
-		for tile_y in range(self.room_size.y):
-			for tile_x in range(self.room_size.x):
-				if self.base_map.get_cell(tile_x, tile_y) == TileMap.INVALID_CELL:
-					var base_score = get_corner_score(self.base_vertices, limit, tile_x, tile_y)
-					if (base_score < 15):
-						cells_set += 1
-						self.base_map.set_cell(tile_x, tile_y, resource.walls[base_score])
-		print ("cells_set = " + str(cells_set))
-		total_cells_set += cells_set
-	print ("total_cells_set = " + str(total_cells_set))
+func draw_rect_feature(room, bounds, dropped = true):
+	room.set_cell(bounds.pos.x, bounds.pos.y, resource.walls[14 if dropped else 01])
+	room.set_cell(bounds.pos.x, bounds.end.y, resource.walls[11 if dropped else 04])
+	room.set_cell(bounds.end.x, bounds.pos.y, resource.walls[13 if dropped else 02])
+	room.set_cell(bounds.end.x, bounds.end.y, resource.walls[07 if dropped else 08])
+	for tile_y in range(bounds.pos.y + 1, bounds.end.y):
+		room.set_cell(bounds.pos.x, tile_y, resource.walls[10 if dropped else 05])
+		room.set_cell(bounds.end.x, tile_y, resource.walls[05 if dropped else 10])
+	for tile_x in range(bounds.pos.x + 1, bounds.end.x):
+		room.set_cell(tile_x, bounds.pos.y, resource.walls[12 if dropped else 03])
+		room.set_cell(tile_x, bounds.end.y, resource.walls[03 if dropped else 12])
 
-func get_corner_score(grid, limit, x, y):
-	var score = 0
+func random_rect_breakdown(bounds):
+	var bounds_list = [bounds]
+	# if any of the bounds are too small already, don't split further
+	if bounds.size.x > 5 and bounds.size.y > 5:
+#		# Split, Horizontal (1) or vertical (2), or don't split at all (0)
+		var choice = randi()%2 + 1 # %3
+		if choice == 1:
+			var split_x_line = randi() % int(bounds.size.x - 4) + 2
+			bounds_list += random_rect_breakdown(Rect2(bounds.pos.x + 1, bounds.pos.y + 1, split_x_line - 1, bounds.size.y - 2))
+			bounds_list += random_rect_breakdown(Rect2(bounds.pos.x + split_x_line + 1, bounds.pos.y + 1, bounds.size.x - split_x_line - 2, bounds.size.y  - 2))
+		elif choice == 2:
+			var split_y_line = randi() % int(bounds.size.y - 4) + 2
+			bounds_list += random_rect_breakdown(Rect2(bounds.pos.x + 1, bounds.pos.y + 1, bounds.size.x - 2, split_y_line - 1))
+			bounds_list += random_rect_breakdown(Rect2(bounds.pos.x + 1, bounds.pos.y + split_y_line + 1, bounds.size.x - 2, bounds.size.y - split_y_line - 2))
 	
-	# Bottom right
-	if grid[x + 1][y + 1] > limit:
-		score += 1 
-	
-	# Bottom left
-	if grid[x][y + 1] > limit:
-		score += 2
-	
-	# Top right
-	if grid[x + 1][y] > limit:
-		score += 4
-	
-	# Top left
-	if grid[x][y] > limit:
-		score += 8
-	
-	return score
+	return bounds_list
 
 func _exit_tree():
 	self.base_map.queue_free();
