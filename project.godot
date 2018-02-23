@@ -1,0 +1,15 @@
+config_version=3
+
+[application]
+
+config/name="Godot Rooms"
+run/main_scene="res://GodotRooms.tscn"
+config/icon="res://icon.png"
+
+[physics_2d]
+
+motion_fix_enabled=true
+
+[rendering]
+
+environment/default_clear_color=#ff2e2f33
