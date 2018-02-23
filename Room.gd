@@ -3,12 +3,12 @@ extends Node2D
 var resource
 var tile_size
 var room_size
+var min_area_size = Vector2(3,3)
 
 var base_map
 
 var path_length = 2
 
-var frontier = []
 var dirs = [Vector2(-path_length, 0), Vector2(path_length, 0), Vector2(0, -path_length), Vector2(0, path_length)]
 
 func init_map():
@@ -39,49 +39,90 @@ func set_all_tiles(tile):
 			self.base_map.set_cell(tile_x, tile_y, tile)
 
 func room_create():
-	# Start with no walls
-	set_all_tiles(resource.walls[1])
-	prims_algorithm(resource.walls[0])
+	# Start with nothing
+	# draw some random boxes on the tile map
 
-func prims_algorithm(tile):
-	var start_x = (randi() % int(self.room_size.x / self.path_length)) * self.path_length + int(self.path_length / 2)
-	var start_y = (randi() % int(self.room_size.y / self.path_length)) * self.path_length + int(self.path_length / 2)
-	var pos = Vector2(start_x, start_y)
-	self.base_map.set_cellv(pos, tile)
-	add_frontiers(pos, tile)
-	while frontier.size() > 0:
-		var ind = randi() % frontier.size()
-		visit(frontier[ind], tile)
-		add_frontiers(frontier[ind], tile)
-		frontier.remove(ind)
+	# From http://journal.stuffwithstuff.com/2014/12/21/rooms-and-mazes/ and 
+	# https://github.com/munificent/hauberk/blob/db360d9efa714efb6d937c31953ef849c7394a39/lib/src/content/dungeon.dart
+	# The random dungeon generator.
+	#
+	# Starting with a stage of solid walls, it works like so:
+	#
+	# 1. Place a number of randomly sized and positioned rooms. If a room
+	#    overlaps an existing room, it is discarded. Any remaining rooms are
+	#    carved out.
 
-func add_frontiers(pos, tile):
-	for dpos in get_dirs_rand_order():
-		var new_pos = pos + dpos
-		var cell_at = self.base_map.get_cellv(new_pos)
-		if cell_at != TileMap.INVALID_CELL && cell_at != tile && not frontier.has(new_pos):
-			frontier.append(new_pos)
+	draw_random_boxes(resource.walls[0])
 
-func get_dirs_rand_order():
-	var dirs = [] + self.dirs
-	var new_dirs = []
-	while dirs.size()  > 0:
-		var ind = randi() % dirs.size()
-		new_dirs.append(dirs[ind])
-		dirs.remove(ind)
-	return new_dirs
+	# 2. Any remaining solid areas are filled in with mazes. The maze generator
+	#    will grow and fill in even odd-shaped areas, but will not touch any
+	#    rooms.
+	# 3. The result of the previous two steps is a series of unconnected rooms
+	#    and mazes. We walk the stage and find every tile that can be a
+	#    "connector". This is a solid tile that is adjacent to two unconnected
+	#    regions.
+	# 4. We randomly choose connectors and open them or place a door there until
+	#    all of the unconnected regions have been joined. There is also a slight
+	#    chance to carve a connector between two already-joined regions, so that
+	#    the dungeon isn't single connected.
+	# 5. The mazes will have a lot of dead ends. Finally, we remove those by
+	#    repeatedly filling in any open tile that's closed on three sides. When
+	#    this is done, every corridor in a maze actually leads somewhere.
+	# 
+	# The end result of this is a multiply-connected dungeon with rooms and lots
+	# of winding corridors.
 
-func visit(pos, tile):
-	self.base_map.set_cellv(pos, tile)
-	for dpos in get_dirs_rand_order():
-		var new_pos = pos + dpos
-		var cell_at = self.base_map.get_cellv(new_pos)
-		if cell_at == tile:
-			# draw path to cell and stop
-			while (new_pos - pos).length() >= 1:
-				self.base_map.set_cellv(new_pos, tile)
-				new_pos -= dpos.normalized()
-			return
+func draw_random_boxes(tile):
+	# randomize()
+	var boxes = []
+	for i in 1000:
+		var box = get_random_box()
+		if not box_collides(boxes, box):
+			boxes.append(box)
+			draw_simple_tile_box(box, tile)
+
+func get_random_box():
+	# var box = Rect2()
+	# box.position.x = randi() % (int(self.room_size.x) - 3) + 1
+	# box.size.x = randi() % (int(self.room_size.x) - int(box.position.x) - 1) 
+	# box.position.y = randi() % (int(self.room_size.y) - 3) + 1
+	# box.size.y = randi() % (int(self.room_size.y) - int(box.position.y) - 1)
+	# return box
+
+	var roomExtraSize = 5 # Increasing this allows some rooms to be larger.
+	var roomMin = 2 # Increasing this makes all rooms bigger (and fewer)
+
+	var size = (roomMin + randi() % (3 + roomExtraSize)) * 2 + 1
+	var rectangularity = randi() % (roomMin + int(size / 2)) * 2
+	var width = size
+	var height = size
+	if randi() % 2 == 0:
+	  width += rectangularity
+	else:
+	  height += rectangularity
+	
+	var x = randi() % int((self.room_size.x - width) / 2) * 2 + 1
+	var y = randi() % int((self.room_size.y - height) / 2) * 2 + 1
+
+	var box = Rect2(x, y, width, height)
+	return box
+
+
+func box_collides(boxes, box):
+	var footprint = box.grow(1)
+	for b in boxes:
+		if box.intersects(b):
+			return true
+	return false
+
+func draw_simple_tile_box(box, tile):
+	var new_pos = Vector2()
+	for y in box.size.y:
+		for x in box.size.x:
+			new_pos.x = box.position.x + x
+			new_pos.y = box.position.y + y
+			self.base_map.set_cellv(new_pos, tile)
+
 
 func _exit_tree():
 	self.base_map.queue_free();
