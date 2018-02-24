@@ -3,13 +3,12 @@ extends Node2D
 var resource
 var tile_size
 var room_size
-var min_area_size = Vector2(3,3)
 
 var base_map
+var map_bounds
 
-var path_length = 2
-
-var dirs = [Vector2(-path_length, 0), Vector2(path_length, 0), Vector2(0, -path_length), Vector2(0, path_length)]
+var connected_cells = [Vector2(-1, 0), Vector2(1, 0), Vector2(0, -1), Vector2(0, 1)]
+var dirs = [Vector2(-2, 0), Vector2(2, 0), Vector2(0, -2), Vector2(0, 2)]
 
 func init_map():
 	var map = TileMap.new()
@@ -25,7 +24,8 @@ func _init(resource, gen_seed = OS.get_time().second):
 	self.resource = resource
 	self.tile_size = resource.tile_size
 	self.room_size = resource.average_room_size
-	
+	self.map_bounds = Rect2(Vector2(), self.room_size)
+
 	self.base_map = init_map()
 	seed(gen_seed)
 	self.generate_content()
@@ -52,11 +52,14 @@ func room_create():
 	#    overlaps an existing room, it is discarded. Any remaining rooms are
 	#    carved out.
 
-	draw_random_boxes(resource.walls[0])
+	draw_random_boxes(resource.walls[2])
 
 	# 2. Any remaining solid areas are filled in with mazes. The maze generator
 	#    will grow and fill in even odd-shaped areas, but will not touch any
 	#    rooms.
+
+	generate_mazes(resource.walls[1])
+
 	# 3. The result of the previous two steps is a series of unconnected rooms
 	#    and mazes. We walk the stage and find every tile that can be a
 	#    "connector". This is a solid tile that is adjacent to two unconnected
@@ -65,12 +68,19 @@ func room_create():
 	#    all of the unconnected regions have been joined. There is also a slight
 	#    chance to carve a connector between two already-joined regions, so that
 	#    the dungeon isn't single connected.
+
+	connect_areas(resource.walls[2], resource.walls[1], resource.walls[0])
+
 	# 5. The mazes will have a lot of dead ends. Finally, we remove those by
 	#    repeatedly filling in any open tile that's closed on three sides. When
 	#    this is done, every corridor in a maze actually leads somewhere.
 	# 
 	# The end result of this is a multiply-connected dungeon with rooms and lots
 	# of winding corridors.
+
+#####################
+# Box area creation #
+#####################
 
 func draw_random_boxes(tile):
 	# randomize()
@@ -82,14 +92,7 @@ func draw_random_boxes(tile):
 			draw_simple_tile_box(box, tile)
 
 func get_random_box():
-	# var box = Rect2()
-	# box.position.x = randi() % (int(self.room_size.x) - 3) + 1
-	# box.size.x = randi() % (int(self.room_size.x) - int(box.position.x) - 1) 
-	# box.position.y = randi() % (int(self.room_size.y) - 3) + 1
-	# box.size.y = randi() % (int(self.room_size.y) - int(box.position.y) - 1)
-	# return box
-
-	var roomExtraSize = 5 # Increasing this allows some rooms to be larger.
+	var roomExtraSize = 3 # Increasing this allows some rooms to be larger.
 	var roomMin = 2 # Increasing this makes all rooms bigger (and fewer)
 
 	var size = (roomMin + randi() % (3 + roomExtraSize)) * 2 + 1
@@ -107,9 +110,7 @@ func get_random_box():
 	var box = Rect2(x, y, width, height)
 	return box
 
-
 func box_collides(boxes, box):
-	var footprint = box.grow(1)
 	for b in boxes:
 		if box.intersects(b):
 			return true
@@ -123,6 +124,149 @@ func draw_simple_tile_box(box, tile):
 			new_pos.y = box.position.y + y
 			self.base_map.set_cellv(new_pos, tile)
 
+###################
+# Maze Generation #
+###################
 
+func generate_mazes(tile):
+	var next_empty = find_next_empty()
+	while next_empty != null:
+		propagate_maze(next_empty, tile)
+		next_empty = find_next_empty()
+
+func propagate_maze(start, tile):
+	var frontier = []
+	self.base_map.set_cellv(start, tile)
+	add_frontiers(start, tile, frontier)
+	while frontier.size() > 0:
+		# could favour newer or older frontier cells to affect the windiness:
+		var ind = randi() % frontier.size()
+		visit(frontier[ind], tile)
+		add_frontiers(frontier[ind], tile, frontier)
+		frontier.remove(ind)
+
+func add_frontiers(pos, tile, frontier):
+	print ("adding frontiers for ", pos)
+	for dpos in get_dirs_rand_order():
+		var new_pos = pos + dpos
+		var cell_at = self.base_map.get_cellv(new_pos)
+		print (new_pos, " has cell ", cell_at)
+		if cell_at == TileMap.INVALID_CELL && not frontier.has(new_pos) && map_bounds.has_point(new_pos):
+			print ("adding frontier: ", new_pos)
+			frontier.append(new_pos)
+
+func get_dirs_rand_order():
+	var dirs = [] + self.dirs
+	var new_dirs = []
+	while dirs.size() > 0:
+		var ind = randi() % dirs.size()
+		new_dirs.append(dirs[ind])
+		dirs.remove(ind)
+	return new_dirs
+
+func visit(pos, tile):
+	# This links a part of the existing maze path to the current cell
+	self.base_map.set_cellv(pos, tile)
+	for dpos in get_dirs_rand_order():
+		var new_pos = pos + dpos
+		var cell_at = self.base_map.get_cellv(new_pos)
+		if cell_at == tile:
+			# draw path to cell and stop
+			while 1 <= (new_pos - pos).length():
+				self.base_map.set_cellv(new_pos, tile)
+				new_pos -= dpos.normalized()
+			return
+	
+func find_next_empty():
+	# Find an odd vector starting position
+	for y in range(1,self.room_size.y,2):
+		for x in range(1,self.room_size.x,2):
+			if self.base_map.get_cell(x, y) == -1:
+				return Vector2(x, y)
+				# self.base_map.set_cell(x, y, tile)
+	return null
+
+#####################################
+# connect all the unconnected areas #
+#####################################
+
+func connect_areas(box_tile, maze_tile, tile):
+	var connectors = find_connection_tiles(box_tile, maze_tile)
+	var fill_frontier = []
+	var connector_frontier = []
+
+	## DEBUG ##
+	# for c in connectors:
+	#	self.base_map.set_cellv(c, tile)
+	## ----- ##
+	
+	# Set the first random maze tile to be in the final region
+	var pos = Vector2(randi() % int(self.room_size.x), randi() % int(self.room_size.y))
+	while self.base_map.get_cellv(pos) != maze_tile:
+		pos.x = randi() % int(self.room_size.x)
+		pos.y = randi() % int(self.room_size.y)
+	fill_frontier.append(pos)
+
+	# # Work from the frontier, add any connecting tiles to the frontier.
+	# # Add any connecting connectors to the connection frontier
+	# while fill_frontier.size() > 0 || connector_frontier.size() > 0:
+	# 	while fill_frontier.size() > 0:
+	# 		fill_visit(fill_frontier, connectors, connector_frontier, tile)
+	# 	# Modify one (or some) of the frontier connectors to become the new frontier, then continue
+	# 	if connector_frontier.size() > 1:
+	# 		var connector = connector_frontier[randi() % connector_frontier.size()]
+	# 		connector_frontier.erase(connector)
+	# 		while is_already_connected(connector, tile) && connector_frontier.size() > 1:
+	# 			connector = connector_frontier[randi() % connector_frontier.size()]
+	# 			connector_frontier.erase(connector)
+	# 		fill_frontier.append(connector)
+
+# func fill_visit(fill_frontier, connectors, connector_frontier, tile):
+# 	var pos = fill_frontier.pop_back()
+# 	self.base_map.set_cellv(pos, tile)
+# 	for dpos in self.connected_cells:
+# 		var new_pos = pos + dpos
+# 		var cell_at = self.base_map.get_cellv(new_pos)
+# 		if cell_at != TileMap.INVALID_CELL && cell_at != tile:
+# 			fill_frontier.append(new_pos)
+# 		elif connectors.has(new_pos) && not is_already_connected(new_pos, tile):
+# 			# As long as the new connector is not being surrounded by cells already
+# 			connector_frontier.append(new_pos)
+# 			connectors.erase(new_pos)
+
+
+func find_connection_tiles(box_tile, maze_tile):
+	var connections = []
+	for y in range(1, self.room_size.y - 1):
+		for x in range(1, self.room_size.x - 1):
+			# If the tile isn't empty, it's not a connector
+			var pos = Vector2(x, y)
+			if self.base_map.get_cellv(pos) != TileMap.INVALID_CELL: continue
+			# Only collect areas that join a box to another box or maze
+			if can_make_connection_to_region(pos, box_tile, maze_tile):
+				connections.append(pos)
+	return connections
+
+func can_make_connection_to_region(pos, tile, region_tile):
+	var loose_cells = 0
+	var region_cells = 0
+	for dpos in self.connected_cells:
+		var cell_at = self.base_map.get_cellv(pos + dpos)
+		if cell_at == tile: loose_cells += 1
+		if cell_at == region_tile: region_cells += 1
+	if loose_cells >= 1 && loose_cells + region_cells > 1:
+		return true
+	return false
+
+# func is_already_connected(connector, region_tile):
+# 	var region_cells = 0
+# 	for dpos in self.connected_cells:
+# 		var cell_at = self.base_map.get_cellv(connector + dpos)
+# 		if cell_at == region_tile: region_cells += 1
+# 	if region_cells > 1:
+# 		return true
+# 	return false
+
+# TODO: Don't recall why I'm doing this, better look at the documentation:
 func _exit_tree():
-	self.base_map.queue_free();
+	self.base_map.queue_free()
