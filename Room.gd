@@ -146,13 +146,10 @@ func propagate_maze(start, tile):
 		frontier.remove(ind)
 
 func add_frontiers(pos, tile, frontier):
-	print ("adding frontiers for ", pos)
 	for dpos in get_dirs_rand_order():
 		var new_pos = pos + dpos
 		var cell_at = self.base_map.get_cellv(new_pos)
-		print (new_pos, " has cell ", cell_at)
 		if cell_at == TileMap.INVALID_CELL && not frontier.has(new_pos) && map_bounds.has_point(new_pos):
-			print ("adding frontier: ", new_pos)
 			frontier.append(new_pos)
 
 func get_dirs_rand_order():
@@ -197,7 +194,7 @@ func connect_areas(box_tile, maze_tile, tile):
 
 	## DEBUG ##
 	# for c in connectors:
-	#	self.base_map.set_cellv(c, tile)
+	# 	self.base_map.set_cellv(c, resource.walls[4])
 	## ----- ##
 	
 	# Set the first random maze tile to be in the final region
@@ -207,32 +204,44 @@ func connect_areas(box_tile, maze_tile, tile):
 		pos.y = randi() % int(self.room_size.y)
 	fill_frontier.append(pos)
 
-	# # Work from the frontier, add any connecting tiles to the frontier.
-	# # Add any connecting connectors to the connection frontier
-	# while fill_frontier.size() > 0 || connector_frontier.size() > 0:
-	# 	while fill_frontier.size() > 0:
-	# 		fill_visit(fill_frontier, connectors, connector_frontier, tile)
-	# 	# Modify one (or some) of the frontier connectors to become the new frontier, then continue
-	# 	if connector_frontier.size() > 1:
-	# 		var connector = connector_frontier[randi() % connector_frontier.size()]
-	# 		connector_frontier.erase(connector)
-	# 		while is_already_connected(connector, tile) && connector_frontier.size() > 1:
-	# 			connector = connector_frontier[randi() % connector_frontier.size()]
-	# 			connector_frontier.erase(connector)
-	# 		fill_frontier.append(connector)
+	# Work from the frontier, add any connecting tiles to the frontier.
+	# Add any connecting connectors to the connection frontier
 
-# func fill_visit(fill_frontier, connectors, connector_frontier, tile):
-# 	var pos = fill_frontier.pop_back()
-# 	self.base_map.set_cellv(pos, tile)
-# 	for dpos in self.connected_cells:
-# 		var new_pos = pos + dpos
-# 		var cell_at = self.base_map.get_cellv(new_pos)
-# 		if cell_at != TileMap.INVALID_CELL && cell_at != tile:
-# 			fill_frontier.append(new_pos)
-# 		elif connectors.has(new_pos) && not is_already_connected(new_pos, tile):
-# 			# As long as the new connector is not being surrounded by cells already
-# 			connector_frontier.append(new_pos)
-# 			connectors.erase(new_pos)
+	# While we're still creating new frontiers
+	while fill_frontier.size() + connectors.size() + connector_frontier.size() > 0:
+		# Clear any already regionally connected squares
+		# From both the connector pool and the connector frontier
+		strip_regions_connected(connectors, tile)
+		strip_regions_connected(connector_frontier, tile)
+		
+		# Flood fill using the current frontier list
+		# (we actually start the loop here)
+		while fill_frontier.size() > 0:
+			fill_visit(fill_frontier, connectors, connector_frontier, tile)
+
+		# Modify one (or some) of the frontier connectors to become the new frontier
+		if connector_frontier.size() > 1:
+			var connector = connector_frontier[randi() % connector_frontier.size()]
+			fill_frontier.append(connector)
+			fill_visit(fill_frontier, connectors, connector_frontier, tile)
+		
+func strip_regions_connected(list, region_tile):
+	for c in list:
+		if is_already_connected(c, region_tile):
+			list.erase(c)
+
+func fill_visit(fill_frontier, connectors, connector_frontier, tile):
+	var pos = fill_frontier.pop_back()
+	self.base_map.set_cellv(pos, tile)
+	for dpos in self.connected_cells:
+		var new_pos = pos + dpos
+		var cell_at = self.base_map.get_cellv(new_pos)
+		if cell_at != TileMap.INVALID_CELL && cell_at != tile:
+			fill_frontier.append(new_pos)
+		elif connectors.has(new_pos) && not is_already_connected(new_pos, tile):
+			# As long as the new connector is not being surrounded by cells already
+			connector_frontier.append(new_pos)
+			# connectors.erase(new_pos)
 
 
 func find_connection_tiles(box_tile, maze_tile):
@@ -258,14 +267,14 @@ func can_make_connection_to_region(pos, tile, region_tile):
 		return true
 	return false
 
-# func is_already_connected(connector, region_tile):
-# 	var region_cells = 0
-# 	for dpos in self.connected_cells:
-# 		var cell_at = self.base_map.get_cellv(connector + dpos)
-# 		if cell_at == region_tile: region_cells += 1
-# 	if region_cells > 1:
-# 		return true
-# 	return false
+func is_already_connected(connector, region_tile):
+	var region_cells = 0
+	for dpos in self.connected_cells:
+		var cell_at = self.base_map.get_cellv(connector + dpos)
+		if cell_at == region_tile: region_cells += 1
+	if region_cells > 1:
+		return true
+	return false
 
 # TODO: Don't recall why I'm doing this, better look at the documentation:
 func _exit_tree():
