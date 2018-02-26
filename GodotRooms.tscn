@@ -36,7 +36,7 @@ script = ExtResource( 2 )
 
 script = ExtResource( 3 )
 tileset = ExtResource( 1 )
-average_room_size = Vector2( 63, 37 )
+average_room_size = Vector2( 21, 23 )
 map_name = "TestRoom"
 
 
