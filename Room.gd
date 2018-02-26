@@ -74,7 +74,9 @@ func room_create():
 	# 5. The mazes will have a lot of dead ends. Finally, we remove those by
 	#    repeatedly filling in any open tile that's closed on three sides. When
 	#    this is done, every corridor in a maze actually leads somewhere.
-	# 
+	
+	remove_dead_ends()
+
 	# The end result of this is a multiply-connected dungeon with rooms and lots
 	# of winding corridors.
 
@@ -243,7 +245,6 @@ func fill_visit(fill_frontier, connectors, connector_frontier, tile):
 			connector_frontier.append(new_pos)
 			# connectors.erase(new_pos)
 
-
 func find_connection_tiles(box_tile, maze_tile):
 	var connections = []
 	for y in range(1, self.room_size.y - 1):
@@ -275,6 +276,34 @@ func is_already_connected(connector, region_tile):
 	if region_cells > 1:
 		return true
 	return false
+
+########################
+# Remove the dead ends #
+########################
+
+func remove_dead_ends():
+	var removed_count = 1
+	while removed_count > 0:
+		removed_count = 0
+		for y in self.room_size.y:
+			for x in self.room_size.x:
+				
+				# If this cell isn't a path, ignore
+				var cell = Vector2(x, y)
+				if self.base_map.get_cellv(cell) == TileMap.INVALID_CELL:
+					continue
+				
+				# Count the "walls" of this cell
+				var walls = 0
+				for dpos in self.connected_cells:
+					var possible_wall = cell + dpos
+					if self.base_map.get_cellv(possible_wall) == TileMap.INVALID_CELL:
+						walls += 1
+
+				# Clear (and count) all cells that are surrounded on 3 sides
+				if walls >= 3:
+					self.base_map.set_cellv(cell, TileMap.INVALID_CELL)
+					removed_count += 1
 
 # TODO: Don't recall why I'm doing this, better look at the documentation:
 func _exit_tree():
