@@ -1,190 +1,213 @@
-[gd_scene load_steps=2 format=1]
+[gd_scene load_steps=2 format=2]
 
 [ext_resource path="res://tiles.png" type="Texture" id=1]
 
-[node name="Node2D" type="Node2D"]
+[node name="Node2D" type="Node2D" index="0"]
 
-[node name="wall_14" type="Sprite" parent="."]
+[node name="wall_14" type="Sprite" parent="." index="0"]
 
 texture = ExtResource( 1 )
 centered = false
-region = true
+region_enabled = true
 region_rect = Rect2( 0, 0, 16, 16 )
+_sections_unfolded = [ "Animation", "Offset", "Region" ]
 
-[node name="wall_12" type="Sprite" parent="."]
+[node name="wall_12" type="Sprite" parent="." index="1"]
 
-transform/pos = Vector2( 16, 0 )
+position = Vector2( 16, 0 )
 texture = ExtResource( 1 )
 centered = false
-region = true
+region_enabled = true
 region_rect = Rect2( 16, 0, 16, 16 )
+_sections_unfolded = [ "Offset", "Region", "Transform" ]
 
-[node name="wall_13" type="Sprite" parent="."]
+[node name="wall_13" type="Sprite" parent="." index="2"]
 
-transform/pos = Vector2( 32, 0 )
+position = Vector2( 32, 0 )
 texture = ExtResource( 1 )
 centered = false
-region = true
+region_enabled = true
 region_rect = Rect2( 32, 0, 16, 16 )
+_sections_unfolded = [ "Region", "Transform" ]
 
-[node name="wall_01" type="Sprite" parent="."]
+[node name="wall_01" type="Sprite" parent="." index="3"]
 
-transform/pos = Vector2( 48, 0 )
+position = Vector2( 48, 0 )
 texture = ExtResource( 1 )
 centered = false
-region = true
+region_enabled = true
 region_rect = Rect2( 48, 0, 16, 16 )
+_sections_unfolded = [ "Region", "Transform" ]
 
-[node name="wall_02" type="Sprite" parent="."]
+[node name="wall_02" type="Sprite" parent="." index="4"]
 
-transform/pos = Vector2( 64, 0 )
+position = Vector2( 64, 0 )
 texture = ExtResource( 1 )
 centered = false
-region = true
+region_enabled = true
 region_rect = Rect2( 64, 0, 16, 16 )
+_sections_unfolded = [ "Region", "Transform" ]
 
-[node name="wall_10" type="Sprite" parent="."]
+[node name="wall_10" type="Sprite" parent="." index="5"]
 
-transform/pos = Vector2( 0, 16 )
+position = Vector2( 0, 16 )
 texture = ExtResource( 1 )
 centered = false
-region = true
+region_enabled = true
 region_rect = Rect2( 0, 16, 16, 16 )
+_sections_unfolded = [ "Region", "Transform" ]
 
-[node name="wall_00" type="Sprite" parent="."]
+[node name="wall_00" type="Sprite" parent="." index="6"]
 
-transform/pos = Vector2( 16, 16 )
+position = Vector2( 16, 16 )
 texture = ExtResource( 1 )
 centered = false
-region = true
+region_enabled = true
 region_rect = Rect2( 16, 16, 16, 16 )
+_sections_unfolded = [ "Region", "Transform" ]
 
-[node name="wall_05" type="Sprite" parent="."]
+[node name="wall_05" type="Sprite" parent="." index="7"]
 
-transform/pos = Vector2( 32, 16 )
+position = Vector2( 32, 16 )
 texture = ExtResource( 1 )
 centered = false
-region = true
+region_enabled = true
 region_rect = Rect2( 32, 16, 16, 16 )
+_sections_unfolded = [ "Region", "Transform" ]
 
-[node name="wall_04" type="Sprite" parent="."]
+[node name="wall_04" type="Sprite" parent="." index="8"]
 
-transform/pos = Vector2( 48, 16 )
+position = Vector2( 48, 16 )
 texture = ExtResource( 1 )
 centered = false
-region = true
+region_enabled = true
 region_rect = Rect2( 48, 16, 16, 16 )
+_sections_unfolded = [ "Region", "Transform" ]
 
-[node name="wall_08" type="Sprite" parent="."]
+[node name="wall_08" type="Sprite" parent="." index="9"]
 
-transform/pos = Vector2( 64, 16 )
+position = Vector2( 64, 16 )
 texture = ExtResource( 1 )
 centered = false
-region = true
+region_enabled = true
 region_rect = Rect2( 64, 16, 16, 16 )
+_sections_unfolded = [ "Region", "Transform" ]
 
-[node name="wall_11" type="Sprite" parent="."]
+[node name="wall_11" type="Sprite" parent="." index="10"]
 
-transform/pos = Vector2( 0, 32 )
+position = Vector2( 0, 32 )
 texture = ExtResource( 1 )
 centered = false
-region = true
+region_enabled = true
 region_rect = Rect2( 0, 32, 16, 16 )
+_sections_unfolded = [ "Region", "Transform" ]
 
-[node name="wall_03" type="Sprite" parent="."]
+[node name="wall_03" type="Sprite" parent="." index="11"]
 
-transform/pos = Vector2( 16, 32 )
+position = Vector2( 16, 32 )
 texture = ExtResource( 1 )
 centered = false
-region = true
+region_enabled = true
 region_rect = Rect2( 16, 32, 16, 16 )
+_sections_unfolded = [ "Region", "Transform" ]
 
-[node name="wall_07" type="Sprite" parent="."]
+[node name="wall_07" type="Sprite" parent="." index="12"]
 
-transform/pos = Vector2( 32, 32 )
+position = Vector2( 32, 32 )
 texture = ExtResource( 1 )
 centered = false
-region = true
+region_enabled = true
 region_rect = Rect2( 32, 32, 16, 16 )
+_sections_unfolded = [ "Region", "Transform" ]
 
-[node name="wall_06" type="Sprite" parent="."]
+[node name="wall_06" type="Sprite" parent="." index="13"]
 
-transform/pos = Vector2( 48, 32 )
+position = Vector2( 48, 32 )
 texture = ExtResource( 1 )
 centered = false
-region = true
+region_enabled = true
 region_rect = Rect2( 48, 32, 16, 16 )
+_sections_unfolded = [ "Region", "Transform" ]
 
-[node name="wall_09" type="Sprite" parent="."]
+[node name="wall_09" type="Sprite" parent="." index="14"]
 
-transform/pos = Vector2( 64, 32 )
+position = Vector2( 64, 32 )
 texture = ExtResource( 1 )
 centered = false
-region = true
+region_enabled = true
 region_rect = Rect2( 64, 32, 16, 16 )
+_sections_unfolded = [ "Region", "Transform" ]
 
-[node name="stair_12" type="Sprite" parent="."]
+[node name="stair_12" type="Sprite" parent="." index="15"]
 
-transform/pos = Vector2( 0, 48 )
+position = Vector2( 0, 48 )
 texture = ExtResource( 1 )
 centered = false
-region = true
+region_enabled = true
 region_rect = Rect2( 0, 48, 16, 16 )
+_sections_unfolded = [ "Region", "Transform" ]
 
-[node name="stair_05" type="Sprite" parent="."]
+[node name="stair_05" type="Sprite" parent="." index="16"]
 
-transform/pos = Vector2( 16, 48 )
+position = Vector2( 16, 48 )
 texture = ExtResource( 1 )
 centered = false
-region = true
+region_enabled = true
 region_rect = Rect2( 16, 48, 16, 16 )
+_sections_unfolded = [ "Region", "Transform" ]
 
-[node name="stair_10" type="Sprite" parent="."]
+[node name="stair_10" type="Sprite" parent="." index="17"]
 
-transform/pos = Vector2( 32, 48 )
+position = Vector2( 32, 48 )
 texture = ExtResource( 1 )
 centered = false
-region = true
+region_enabled = true
 region_rect = Rect2( 32, 48, 16, 16 )
+_sections_unfolded = [ "Region", "Transform" ]
 
-[node name="stair_03" type="Sprite" parent="."]
+[node name="stair_03" type="Sprite" parent="." index="18"]
 
-transform/pos = Vector2( 48, 48 )
+position = Vector2( 48, 48 )
 texture = ExtResource( 1 )
 centered = false
-region = true
+region_enabled = true
 region_rect = Rect2( 48, 48, 16, 16 )
+_sections_unfolded = [ "Region", "Transform" ]
 
-[node name="exit_12" type="Sprite" parent="."]
+[node name="exit_12" type="Sprite" parent="." index="19"]
 
-transform/pos = Vector2( 0, 64 )
+position = Vector2( 0, 64 )
 texture = ExtResource( 1 )
 centered = false
-region = true
+region_enabled = true
 region_rect = Rect2( 0, 64, 16, 16 )
+_sections_unfolded = [ "Region", "Transform" ]
 
-[node name="exit_05" type="Sprite" parent="."]
+[node name="exit_05" type="Sprite" parent="." index="20"]
 
-transform/pos = Vector2( 16, 64 )
+position = Vector2( 16, 64 )
 texture = ExtResource( 1 )
 centered = false
-region = true
+region_enabled = true
 region_rect = Rect2( 16, 64, 16, 16 )
+_sections_unfolded = [ "Region", "Transform" ]
 
-[node name="exit_10" type="Sprite" parent="."]
+[node name="exit_10" type="Sprite" parent="." index="21"]
 
-transform/pos = Vector2( 32, 64 )
+position = Vector2( 32, 64 )
 texture = ExtResource( 1 )
 centered = false
-region = true
+region_enabled = true
 region_rect = Rect2( 32, 64, 16, 16 )
+_sections_unfolded = [ "Region", "Transform" ]
 
-[node name="exit_03" type="Sprite" parent="."]
+[node name="exit_03" type="Sprite" parent="." index="22"]
 
-transform/pos = Vector2( 48, 64 )
+position = Vector2( 48, 64 )
 texture = ExtResource( 1 )
 centered = false
-region = true
+region_enabled = true
 region_rect = Rect2( 48, 64, 16, 16 )
+_sections_unfolded = [ "Region", "Transform" ]
 
 
