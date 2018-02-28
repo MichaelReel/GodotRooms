@@ -8,10 +8,14 @@ var current_room
 func _ready():
 	print("readying room manager")
 	
-	self.resource = find_node("RoomResource", false)
+	self.resource = $RoomResource
 	
 	self.current_room = Room.new(resource)
 	self.add_child(self.current_room, true)
-	
-func _exit_tree():
-	self.current_room.queue_free()
+
+	var navNode = self.get_parent().get_node("Navigation2D/navpoly")
+	print ("navNode: ", navNode)
+	# navNode.navpoly_add(self.current_room.nav, Transform2D(0, Vector2(0,0)))
+	navNode.navpoly = self.current_room.nav
+	navNode.enabled = false
+	navNode.enabled = true
