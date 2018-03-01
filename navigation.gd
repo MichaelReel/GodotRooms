@@ -32,7 +32,7 @@ func _process(delta):
 		set_process(false)
 
 func _update_path():
-	var p = get_simple_path(begin, end, true)
+	var p = self.get_simple_path(begin, end, true)
 	path = Array(p)
 	path.invert()
 	

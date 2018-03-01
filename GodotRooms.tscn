@@ -6,14 +6,14 @@
 [ext_resource path="res://navigation.gd" type="Script" id=4]
 [ext_resource path="res://robork.png" type="Texture" id=5]
 
-[sub_resource type="NavigationPolygon" id=2]
+[sub_resource type="NavigationPolygon" id=1]
 
 vertices = PoolVector2Array(  )
 polygons = [  ]
 outlines = [  ]
 _sections_unfolded = [ "Resource" ]
 
-[sub_resource type="AtlasTexture" id=1]
+[sub_resource type="AtlasTexture" id=2]
 
 flags = 4
 atlas = ExtResource( 5 )
@@ -41,13 +41,13 @@ _sections_unfolded = [ "Material", "Pause", "Transform", "Visibility", "Z Index"
 
 [node name="navpoly" type="NavigationPolygonInstance" parent="Navigation2D" index="0"]
 
-navpoly = SubResource( 2 )
+navpoly = SubResource( 1 )
 enabled = true
 
 [node name="Robot" type="Sprite" parent="Navigation2D" index="1"]
 
 position = Vector2( 64, 64 )
-texture = SubResource( 1 )
+texture = SubResource( 2 )
 region_enabled = true
 region_rect = Rect2( 0, 0, 16, 16 )
 _sections_unfolded = [ "Animation", "Material", "Offset", "Region", "Transform", "Visibility", "Z Index" ]
