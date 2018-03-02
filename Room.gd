@@ -20,8 +20,10 @@ func _init(resource, exits = [], gen_seed = OS.get_time().second):
 	var path_tile = self.resource.walls[0]
 	var scale = 2
 	draw_path(baseLayout, scale, path_tile)
-	create_navigation(scale, path_tile)
+	create_navigation(scale)
 	draw_walls(baseLayout, scale, path_tile)
+
+	# setup_debug_draw()
 
 func add_exits():
 	pass
@@ -49,62 +51,88 @@ func draw_walls(baseLayout, scale, path_tile):
 			if get_cellv(dest_cell) == TileMap.INVALID_CELL:
 				var score = get_corner_scores(self, dest_cell, path_tile)
 				if score == 0: continue
-				# print (dest_cell, " : ", score)
 				self.set_cellv(dest_cell, self.resource.walls[score])
 
 
-func create_navigation(scale, path_tile):
-	# TODO: Do this properly
+func create_navigation(scale):
 	self.nav = NavigationPolygon.new()
-	var outlines = PoolVector2Array() 
-	# [PoolVector2Array([32.0, 32.0, 640.0, 32.0, 640.0, 704.0, 32.0, 704.0])]
-	# try to find the base outline - where to start?
+	# Get a list of top left corners
+	var start_cells = get_start_cells(scale)
 
-	var start_cell = get_start_cell(scale, path_tile)
-	self.dir = 0
-	print (start_cell)
-	var cellv = travel(start_cell, path_tile)
-	while start_cell.distance_to(cellv) > 0.1:
-		print ("add cell to polygon: ", cellv)
-		outlines.push_back(Vector2(cellv.x * self.tile_size.x, cellv.y * self.tile_size.y))
-		cellv = travel(cellv, path_tile)
-		print (cellv)
-
-	if outlines.size() > 0:
+	# while start_cells.size() > 0:
+	while not start_cells.empty():
+		var outlines = PoolVector2Array()
+		var start_cell = start_cells.pop_front()
+		self.dir = 0
+		outlines.push_back(Vector2(start_cell.x * self.tile_size.x, start_cell.y * self.tile_size.y))
+		var cellv = travel(start_cell, get_cellv(start_cell))
+		while start_cell.distance_to(cellv) > 0.1:
+			# check we don't have an extra start point for this polygon
+			if start_cells.has(cellv): start_cells.erase(cellv)
+			# add cell to the current polygon
+			outlines.push_back(Vector2(cellv.x * self.tile_size.x, cellv.y * self.tile_size.y))
+			cellv = travel(cellv, get_cellv(start_cell))
 		nav.add_outline(outlines)
-		nav.make_polygons_from_outlines()
 
-func get_start_cell(scale, path_tile):
+	nav.make_polygons_from_outlines()
+
+func get_start_cells(scale):
+	# This will collect all potential start cells
+	# There may be more than one per area, but we'll deal with that later
+	var start_cells = []
+	var left_mod = Vector2(-1,0)
+	var up_mod = Vector2(0,-1)
+
 	for y in self.room_size.y * scale:
 		for x in self.room_size.x * scale:
+			# We're looking for top-left corners
 			var cellv = Vector2(x, y)
-			if get_cellv(cellv) == path_tile:
-				# This'll do!
-				return cellv
-	# Shouldn't drop out without finding at least one tile (yet)
+			var cell = get_cellv(cellv)
+			var left = get_cellv(cellv + left_mod)
+			var up = get_cellv(cellv + up_mod)
+			var up_left = get_cellv(cellv + left_mod + up_mod)
+			if left == up_left && up_left == up && left != cell:
+				start_cells.append(cellv)
+	return start_cells
 
 var dir
 var dirs = [Vector2(1,0), Vector2(0,1), Vector2(-1,0), Vector2(0,-1)]
-#                               *                             
-#                 a           []|         b []            a b 
-#             *-->              v          <--*            ^  
-#              [] b            b a        a                |[]
-#                                                          *  
+#                               *                         a b 
+#                 a             |[]       b                ^  
+#             *-->              v          <--*            |  
+#              [] b            b a        a    []          *  
+#                                                           []
 # a - populated => anti-clockwise => dir_ind --
 # a - empty, b - populated => ahead => dir_ind ==
 # a - empty, b - empty => clockwise => dir_ind ++
 
 func travel(last_cell, path_tile):
-	var b = last_cell + dirs[dir]
-	var a = b + dirs[(dir + 3) % 4]
-	print ("a: ", a, ", b:", b)
+	# We're going in the direction of 'dir' anyway
+	var next_cell = last_cell + dirs[dir]
+	# Figure out where we're going after that
+	var a
+	var b
+	match dir:
+		0: # Right
+			a = next_cell + dirs[3]
+			b = next_cell
+		1: # Down
+			a = next_cell
+			b = next_cell + dirs[2]
+		2: # Left
+			a = next_cell + dirs[2]
+			b = a + dirs[3]
+		3: # Up
+			b = next_cell + dirs[3]
+			a = b + dirs[2]
+
 	if self.get_cellv(a) == path_tile:
 		dir = (dir + 3) % 4
 	elif self.get_cellv(b) == path_tile:
 		pass
 	else:
 		dir = (dir + 1) % 4
-	return b
+	return next_cell
 
 
 #                  
@@ -142,4 +170,12 @@ func get_corner_scores(map, pos, tile):
 			return i
 	return 0
 
+func setup_debug_draw():
+	var debug_polys = []
+	for i in self.nav.get_outline_count():
+		debug_polys.append(self.nav.get_outline(i))
 
+	var DebugDrawer = load("res://DebugPolys.gd")
+	var debug = DebugDrawer.new(debug_polys)
+
+	self.add_child(debug)
