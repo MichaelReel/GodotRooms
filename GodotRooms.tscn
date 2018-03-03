@@ -3,9 +3,9 @@
 [ext_resource path="res://scripts/RoomManager.gd" type="Script" id=1]
 [ext_resource path="res://scripts/Resource.gd" type="Script" id=2]
 [ext_resource path="res://TileSet.tres" type="TileSet" id=3]
-[ext_resource path="res://points_of_interest.png" type="Texture" id=4]
+[ext_resource path="res://graphics/points_of_interest.png" type="Texture" id=4]
 [ext_resource path="res://scripts/navigation.gd" type="Script" id=5]
-[ext_resource path="res://robork.png" type="Texture" id=6]
+[ext_resource path="res://graphics/robork.png" type="Texture" id=6]
 
 [sub_resource type="NavigationPolygon" id=1]
 
@@ -16,7 +16,7 @@ _sections_unfolded = [ "Resource" ]
 
 [sub_resource type="AtlasTexture" id=2]
 
-flags = 4
+flags = 0
 atlas = ExtResource( 6 )
 region = Rect2( 0, 0, 16, 16 )
 margin = Rect2( 0, 0, 0, 0 )

@@ -2,15 +2,15 @@
 
 importer="texture"
 type="StreamTexture"
-path="res://.import/robork.png-86a203bdcb9489d37e28f3cd64a999a0.stex"
+path="res://.import/tiles.png-8081a46861581d6ce46a73301830a70c.stex"
 
 [deps]
 
-source_file="res://robork.png"
-source_md5="97042e01ca3e3e63b0374b26d2a83f41"
+source_file="res://graphics/tiles.png"
+source_md5="87f3db64a32a21c072a1e351228a89c8"
 
-dest_files=[ "res://.import/robork.png-86a203bdcb9489d37e28f3cd64a999a0.stex" ]
-dest_md5="c7a73c67dc96baba4857e28bdd9769c6"
+dest_files=[ "res://.import/tiles.png-8081a46861581d6ce46a73301830a70c.stex" ]
+dest_md5="bdf7db14311e7369eb15ec278cfdd027"
 
 [params]
 
