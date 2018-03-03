@@ -36,7 +36,7 @@ func _update_path():
 	path = Array(p)
 	path.invert()
 	
-	print ("begin: ", begin," -> end: ", end, " path: ", path)
+	# print ("begin: ", begin," -> end: ", end, " path: ", path)
 
 	set_process(true)
 
@@ -44,5 +44,5 @@ func _input(event):
 	if event is InputEventMouseButton and event.pressed and event.button_index == 1:
 		begin = $Robot.position
 		# Mouse to local navigation coordinates
-		end = event.position - position
+		end = get_global_mouse_position() - position
 		_update_path()

@@ -8,6 +8,7 @@ var map_bounds
 
 var connected_cells = [Vector2(-1, 0), Vector2(1, 0), Vector2(0, -1), Vector2(0, 1)]
 var dirs = [Vector2(-2, 0), Vector2(2, 0), Vector2(0, -2), Vector2(0, 2)]
+var boxes = []
 
 func _init(room_size, gen_seed = OS.get_time().second):
 
@@ -24,11 +25,10 @@ func _init(room_size, gen_seed = OS.get_time().second):
 
 func draw_random_boxes(tile):
 	# randomize()
-	var boxes = []
 	for i in 1000:
 		var box = get_random_box()
-		if not box_collides(boxes, box):
-			boxes.append(box)
+		if not box_collides(self.boxes, box):
+			self.boxes.append(box)
 			draw_simple_tile_box(box, tile)
 
 func get_random_box():

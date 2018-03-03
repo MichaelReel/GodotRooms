@@ -5,17 +5,39 @@ var Room = load("res://Room.gd")
 var resource
 var current_room
 
+var nav_node
+var cam_node
+
 func _ready():
 	print("readying room manager")
 	
+	# Get the defining root game attributes
 	self.resource = $RoomResource
-	
-	self.current_room = Room.new(resource)
-	self.add_child(self.current_room, true)
+	var world_seed = hash(resource.map_name)
+	seed(world_seed)
 
-	var navNode = self.get_parent().get_node("Navigation2D/navpoly")
-	print ("navNode: ", navNode)
-	# navNode.navpoly_add(self.current_room.nav, Transform2D(0, Vector2(0,0)))
-	navNode.navpoly = self.current_room.nav
-	navNode.enabled = false
-	navNode.enabled = true
+	# Get the navigation and view nodes
+	self.nav_node = get_node("../Navigation2D/navpoly")
+	self.cam_node = get_node("../Navigation2D/Robot/Camera2D")
+	
+	# Create new rooms
+	var new_room = Room.new(resource, [], randi())
+	self.add_child(new_room, true)
+	new_room.visible = false
+
+	# Set the starter room
+	set_current_room(new_room)
+
+func set_current_room(room):
+	if self.current_room: self.current_room.visible = false
+	self.current_room = room
+	self.current_room.visible = true
+
+	# Get the navigation for the room
+	self.nav_node.navpoly = self.current_room.nav
+	self.nav_node.enabled = false
+	self.nav_node.enabled = true
+
+	# Set the camera bounds (top and left are set to 0)
+	self.cam_node.limit_right = int(self.current_room.limit_right)
+	self.cam_node.limit_bottom = int(self.current_room.limit_bottom)
