@@ -1,11 +1,12 @@
 extends Node2D
 
-var Room = load("res://Room.gd")
+var Room = load("res://scripts/Room.gd")
 
 var resource
 var current_room
 
 var nav_node
+var player_node
 var cam_node
 
 func _ready():
@@ -17,8 +18,9 @@ func _ready():
 	seed(world_seed)
 
 	# Get the navigation and view nodes
-	self.nav_node = get_node("../Navigation2D/navpoly")
-	self.cam_node = get_node("../Navigation2D/Robot/Camera2D")
+	self.nav_node    = get_node("../Navigation2D/navpoly")
+	self.player_node = get_node("../Navigation2D/Robot")
+	self.cam_node    = get_node("../Navigation2D/Robot/Camera2D")
 	
 	# Create new rooms
 	var new_room = Room.new(resource, [], randi())
@@ -26,9 +28,10 @@ func _ready():
 	new_room.visible = false
 
 	# Set the starter room
-	set_current_room(new_room)
+	set_current_room(new_room, new_room.spawn)
 
-func set_current_room(room):
+
+func set_current_room(room, entrance):
 	if self.current_room: self.current_room.visible = false
 	self.current_room = room
 	self.current_room.visible = true
@@ -41,3 +44,6 @@ func set_current_room(room):
 	# Set the camera bounds (top and left are set to 0)
 	self.cam_node.limit_right = int(self.current_room.limit_right)
 	self.cam_node.limit_bottom = int(self.current_room.limit_bottom)
+
+	# Put the player character in the correct place
+	self.player_node.position = entrance

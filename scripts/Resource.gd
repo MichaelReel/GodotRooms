@@ -11,7 +11,7 @@ const wave_width = 32
 const wave_height = 32
 const wave_depth = 1
 
-var perlinRef = load("res://PerlinRef.gd")
+var perlinRef = load("res://scripts/PerlinRef.gd")
 
 var tile_size
 

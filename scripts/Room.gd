@@ -1,6 +1,6 @@
 extends TileMap
 
-var BaseLayout = load("res://RoguishGenerator.gd")
+var BaseLayout = load("res://scripts/RoguishGenerator.gd")
 
 var resource
 var tile_size
@@ -10,6 +10,7 @@ var limit_bottom
 
 var nav
 var exits = []
+var spawn
 
 func _init(resource, exit_dirs = [], gen_seed = OS.get_time().second, scale = 2):
 	self.exits = exit_dirs
@@ -34,7 +35,7 @@ func _init(resource, exit_dirs = [], gen_seed = OS.get_time().second, scale = 2)
 	var pois = create_POIs(baseLayout, scale)
 	populate_POIs(pois)
 
-	setup_debug_draw()
+	# setup_debug_draw()
 
 func add_exits():
 	pass
@@ -186,7 +187,7 @@ func setup_debug_draw():
 	for i in self.nav.get_outline_count():
 		debug_polys.append(self.nav.get_outline(i))
 
-	var DebugDrawer = load("res://DebugPolys.gd")
+	var DebugDrawer = load("res://scripts/DebugPolys.gd")
 	var debug = DebugDrawer.new(debug_polys)
 
 	self.add_child(debug)
@@ -196,8 +197,8 @@ func create_POIs(baseLayer, scale):
 	# Create one random spot in each box
 	for box in baseLayer.boxes:
 		var vec = Vector2()
-		vec.x = ((randi() % int(box.size.x)) + box.position.x) * self.tile_size.x
-		vec.y = ((randi() % int(box.size.y)) + box.position.y) * self.tile_size.y
+		vec.x = ((randi() % int(box.size.x - 2)) + box.position.x + 1) * self.tile_size.x
+		vec.y = ((randi() % int(box.size.y - 2)) + box.position.y + 1) * self.tile_size.y
 		pois.append(vec * scale)
 	return pois
 
@@ -205,8 +206,14 @@ func populate_POIs(pois):
 	var templates = self.resource.get_node("SpritePool")
 	var default = templates.get_node("Default")
 
-	for poi in pois:
+	while not pois.empty():
 		# Create a random resource, base, spawn, etc.
+		var poi = pois.pop_back()
+		if not spawn:
+			if pois.size() == 0 || randi() % pois.size() == pois.size():
+				spawn = poi
+				continue
+
 		var s = default.duplicate()
 		s.position = poi
 		add_child(s)
