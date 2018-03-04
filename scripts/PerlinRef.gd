@@ -28,8 +28,8 @@ func getPermutation(init_seed):
 	for src in range(255, -1, -1):
 		init_seed = int(init_seed * 6364136223846793005 + 1442695040888963407)
 		var dst = (init_seed % (src+1))
-		perm[src] = map[dst];
-		map[dst] = map[src];
+		perm[src] = map[dst]
+		map[dst] = map[src]
 
 	return perm
 
@@ -84,7 +84,7 @@ func fade(t):
 	return t * t * t * (t * (t * 6 - 15) + 10)
 
 func grad(hsh, x, y, z):
-	var h = hsh & 15;                      # CONVERT LO 4 BITS OF HASH CODE
+	var h = hsh & 15                       # CONVERT LO 4 BITS OF HASH CODE
 	var u = x if h<8 else y                # INTO 12 GRADIENT DIRECTIONS.
 	var v = y if h<4 else x if h==12 or h==14 else z
 	return (u if (h&1) == 0 else -u) + (v if (h&2) == 0 else -v)

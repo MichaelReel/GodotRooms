@@ -317,7 +317,7 @@ script = ExtResource( 1 )
 
 script = ExtResource( 2 )
 tileset = ExtResource( 3 )
-average_room_size = Vector2( 51, 51 )
+average_base_size = Vector2( 51, 51 )
 map_name = "TestRoom"
 
 [node name="SpritePool" type="Node" parent="RoomManager/RoomResource" index="0"]
@@ -329,6 +329,16 @@ texture = ExtResource( 4 )
 centered = false
 region_enabled = true
 region_rect = Rect2( 0, 0, 16, 16 )
+_sections_unfolded = [ "Region" ]
+
+[node name="Exit" type="Sprite" parent="RoomManager/RoomResource/SpritePool" index="1"]
+
+visible = false
+texture = ExtResource( 4 )
+centered = false
+region_enabled = true
+region_rect = Rect2( 16, 0, 16, 16 )
+_sections_unfolded = [ "Offset", "Region" ]
 
 [node name="Navigation2D" type="Navigation2D" parent="." index="1"]
 
@@ -355,7 +365,7 @@ position = Vector2( -32, -16 )
 anchor_mode = 1
 rotating = false
 current = true
-zoom = Vector2( 0.5, 0.5 )
+zoom = Vector2( 1, 1 )
 limit_left = 0
 limit_top = 0
 limit_right = 10000000

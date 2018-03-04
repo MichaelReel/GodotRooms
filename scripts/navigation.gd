@@ -24,7 +24,7 @@ func _process(delta):
 				path[path.size() - 1] = pfrom.linear_interpolate(pto, to_walk/d)
 				to_walk = 0
 				if update_anim_string(pto - pfrom) or self.idle:
-					print("move" + self.direction_string)
+					# print("move" + self.direction_string)
 					$Robot.get_node("AnimationPlayer").play("move" + self.direction_string)
 					self.idle = false
 		
@@ -34,7 +34,7 @@ func _process(delta):
 		if path.size() < 2:
 			path = []
 			set_process(false)
-			print("idle" + self.direction_string)
+			# print("idle" + self.direction_string)
 			$Robot.get_node("AnimationPlayer").play("idle" + self.direction_string)
 			self.idle = true
 

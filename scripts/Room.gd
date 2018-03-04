@@ -4,31 +4,37 @@ var BaseLayout = load("res://scripts/RoguishGenerator.gd")
 
 var resource
 var tile_size
+var base_size
 var room_size
 var limit_right
 var limit_bottom
+var templates
 
-var nav
-var exits = []
+const EXIT_DIRS = ["top", "bottom", "left", "right", "up", "down"]
+var exits = [null, null, null, null, null, null]
 var spawn
 
-func _init(resource, exit_dirs = [], gen_seed = OS.get_time().second, scale = 2):
-	self.exits = exit_dirs
+var nav
+
+func _init(resource, exit_flags = 0, gen_seed = OS.get_time().second, scale = 2):
 	seed(gen_seed)
 	
 	self.resource = resource
 	self.tile_size = resource.tile_size
-	self.room_size = resource.average_room_size
-	self.limit_right = self.room_size.x * scale * self.tile_size.x
-	self.limit_bottom = self.room_size.y * scale * self.tile_size.y
+	self.base_size = resource.average_base_size
+	self.room_size = self.base_size * scale
+	self.limit_right = self.room_size.x * self.tile_size.x
+	self.limit_bottom = self.room_size.y * self.tile_size.y
 
-	self.set_tileset(self.resource.tileset)
+	self.templates = resource.get_node("SpritePool")
+
+	self.set_tileset(resource.tileset)
 	self.set_cell_size(self.tile_size)
-	var baseLayout = BaseLayout.new(self.room_size, gen_seed)
+	var baseLayout = BaseLayout.new(self.base_size, gen_seed)
 
-	var path_tile = self.resource.walls[0]
+	var path_tile = resource.walls[0]
 	draw_path(baseLayout, scale, path_tile)
-	add_exits()
+	add_exits(exit_flags)
 	create_navigation(scale)
 	draw_walls(baseLayout, scale, path_tile)
 
@@ -37,15 +43,60 @@ func _init(resource, exit_dirs = [], gen_seed = OS.get_time().second, scale = 2)
 
 	# setup_debug_draw()
 
-func add_exits():
-	pass
+func add_exits(exit_flags):
+	var exit_sprite = self.templates.get_node("Exit")
+	for i in EXIT_DIRS.size():
+		var flag = int(pow(2, i))
+		if flag & exit_flags:
+			print("Need to add exit ", EXIT_DIRS[i])
+			exits[i] = {}
+			# Need to add a sprite for the exit
+			exits[i]["sprite"] = exit_sprite.duplicate()
+			exits[i]["sprite"].visible = true
+			add_child(exits[i]["sprite"])
+			# Find the exit position
+			var cellv = get_exit_pos(i)
+			exits[i]["tile"] = cellv
+			var position = Vector2(cellv.x * self.tile_size.x, cellv.y * self.tile_size.y)
+			exits[i]["sprite"].position = position
+			print(exits[i])
+
+func get_exit_pos(i):
+	var cellv
+	var inc
+	print ("sort out ", EXIT_DIRS[i], " exit")
+	match EXIT_DIRS[i]:
+		"top":
+			cellv = Vector2(int(room_size.x / 2), 0)
+			inc = Vector2(0, 1)
+		"bottom":
+			cellv = Vector2(int(room_size.x / 2), room_size.y)
+			inc = Vector2(0, -1)
+		"left":
+			cellv = Vector2(0, int(room_size.y / 2))
+			inc = Vector2(1, 0)
+		"right":
+			cellv = Vector2(room_size.x, int(room_size.y / 2))
+			inc = Vector2(-1, 0)
+		"up":
+			cellv = Vector2(int(room_size.x / 2), int(room_size.y / 2) - 1)
+			inc = Vector2(0, -1)
+		"down":
+			cellv = Vector2(int(room_size.x / 2), int(room_size.y / 2) + 1)
+			inc = Vector2(0, 1)
+	# add inc to start until we find a suitable tile
+	var limit = 10
+	while get_cellv(cellv) == TileMap.INVALID_CELL and limit: 
+		cellv += inc
+		limit -= 1
+	return cellv
 
 # scale should be no less than 2
 func draw_path(baseLayout, scale, path_tile):
 	# For each tile in the base layout draw walls and empty spaces
 	# The empty space and the walls should add up the scale
-	for y in self.room_size.y:
-		for x in self.room_size.x:
+	for y in self.base_size.y:
+		for x in self.base_size.x:
 			var base_cell = Vector2(x, y)
 			var dest_cell = Rect2(base_cell * scale, Vector2(scale, scale))
 			
@@ -56,8 +107,8 @@ func draw_path(baseLayout, scale, path_tile):
 							self.set_cell(rx, ry, path_tile)
 
 func draw_walls(baseLayout, scale, path_tile):
-	for y in self.room_size.y * scale:
-		for x in self.room_size.x * scale:
+	for y in self.room_size.y:
+		for x in self.room_size.x:
 			var dest_cell = Vector2(x, y)
 			# Score and set walls
 			if get_cellv(dest_cell) == TileMap.INVALID_CELL:
@@ -95,8 +146,8 @@ func get_start_cells(scale):
 	var left_mod = Vector2(-1,0)
 	var up_mod = Vector2(0,-1)
 
-	for y in self.room_size.y * scale:
-		for x in self.room_size.x * scale:
+	for y in self.room_size.y:
+		for x in self.room_size.x:
 			# We're looking for top-left corners
 			var cellv = Vector2(x, y)
 			var cell = get_cellv(cellv)
@@ -203,8 +254,7 @@ func create_POIs(baseLayer, scale):
 	return pois
 
 func populate_POIs(pois):
-	var templates = self.resource.get_node("SpritePool")
-	var default = templates.get_node("Default")
+	var default = self.templates.get_node("Default")
 
 	while not pois.empty():
 		# Create a random resource, base, spawn, etc.

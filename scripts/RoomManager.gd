@@ -23,7 +23,7 @@ func _ready():
 	self.cam_node    = get_node("../Navigation2D/Robot/Camera2D")
 	
 	# Create new rooms
-	var new_room = Room.new(resource, [], randi())
+	var new_room = Room.new(resource, 15, randi())
 	self.add_child(new_room, true)
 	new_room.visible = false
 

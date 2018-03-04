@@ -4,7 +4,7 @@ extends Node2D
 # resources to get FSB results and tiles
 
 export (TileSet) var tileset
-export (Vector2) var average_room_size
+export (Vector2) var average_base_size
 export (String) var map_name
 
 const wave_width = 32
