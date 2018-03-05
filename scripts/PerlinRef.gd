@@ -57,7 +57,7 @@ func getFloatHash(x, y, z = 0):
 				lerp(lerp(grad(self.p[AA+1], x  , y  , z-1 ),         # CORNERS
 						  grad(self.p[BA+1], x-1, y  , z-1 ), u),     # OF CUBE
 					 lerp(grad(self.p[AB+1], x  , y-1, z-1 ),
-						  grad(self.p[BB+1], x-1, y-1, z-1 ), u), v), w);
+						  grad(self.p[BB+1], x-1, y-1, z-1 ), u), v), w)
 
 func getHash(x, y, z = 0):
 	return float(self.getFloatHash(x * self.dx, y * self.dy, z * self.dz))
