@@ -1,6 +1,7 @@
 extends TileMap
 
 var BaseLayout = load("res://scripts/RoguishGenerator.gd")
+var Exit = load("res://scripts/Exit.gd")
 
 var resource
 var tile_size
@@ -51,29 +52,29 @@ func _init(resource, exit_flags = 0, gen_seed = OS.get_time().second, scale = 2)
 	# setup_debug_draw()
 
 func add_exits(exit_flags):
-	var exit_sprite = self.templates.get_node("Exit")
 	for i in EXIT_DIRS.size():
 		var flag = int(pow(2, i))
 		if flag & exit_flags:
 			print("Need to add exit ", EXIT_DIRS[i])
-			self.exits[i] = {}
+			self.exits[i] = Exit.new(self.resource)
+
 			# Need to add a sprite for the exit
-			self.exits[i]["sprite"] = exit_sprite.duplicate()
-			self.exits[i]["sprite"].visible = true
-			add_child(self.exits[i]["sprite"])
+			add_child(self.exits[i])
 			# Find the exit position
 			var cellv = get_exit_pos(i)
-			self.exits[i]["tile"] = cellv
+			self.exits[i].cellv = cellv
 			var position = Vector2(cellv.x * self.tile_size.x, cellv.y * self.tile_size.y)
-			self.exits[i]["sprite"].position = position
-			print(self.exits[i])
+			self.exits[i].position = position
+
+	print(self.exits)
+
 
 func set_exit(exit_ind, room_x, room_y, target_exit):
 	# Set the destination room and position
-	exits[exit_ind]["room_x"] = room_x
-	exits[exit_ind]["room_x"] = room_y
+	exits[exit_ind].room_x = room_x
+	exits[exit_ind].room_y = room_y
 	# TODO: This'll likely suck for up and down connections
-	exits[exit_ind]["destination"] = target_exit["sprite"].position + exit_incursion(exit_ind)
+	exits[exit_ind].destination = target_exit.position + exit_incursion(exit_ind)
 
 
 func get_exit_pos(i):

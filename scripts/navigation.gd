@@ -25,17 +25,20 @@ func _process(delta):
 				to_walk = 0
 				if update_anim_string(pto - pfrom) or self.idle:
 					# print("move" + self.direction_string)
-					$Robot.get_node("AnimationPlayer").play("move" + self.direction_string)
+					$Robot.get_node("Sprite/AnimationPlayer").play("move" + self.direction_string)
 					self.idle = false
 		
 		var atpos = path[path.size() - 1]
-		$Robot.position = atpos
+		var collision = $Robot.move_and_collide(atpos - $Robot.position)
+		if collision:
+			# TODO: actual collisiony type things. At the minute, only portal behaviour
+			print (collision)
 		
 		if path.size() < 2:
 			path = []
 			set_process(false)
 			# print("idle" + self.direction_string)
-			$Robot.get_node("AnimationPlayer").play("idle" + self.direction_string)
+			$Robot.get_node("Sprite/AnimationPlayer").play("idle" + self.direction_string)
 			self.idle = true
 
 	else:
@@ -45,9 +48,6 @@ func _update_path():
 	var p = self.get_simple_path(begin, end, true)
 	path = Array(p)
 	path.invert()
-	
-	# print ("begin: ", begin," -> end: ", end, " path: ", path)
-
 	set_process(true)
 
 func _input(event):
