@@ -3,6 +3,8 @@ extends Navigation2D
 # Member variables
 const SPEED = 75.0
 
+var Exit = load("res://scripts/Exit.gd")
+
 var begin = Vector2()
 var end = Vector2()
 var path = []
@@ -23,29 +25,29 @@ func _process(delta):
 			else:
 				path[path.size() - 1] = pfrom.linear_interpolate(pto, to_walk/d)
 				to_walk = 0
-				if update_anim_string(pto - pfrom) or self.idle:
-					# print("move" + self.direction_string)
-					$Robot.get_node("Sprite/AnimationPlayer").play("move" + self.direction_string)
-					self.idle = false
+				if update_anim_string(pto - pfrom) or idle:
+					# print("move" + direction_string)
+					$Robot.get_node("Sprite/AnimationPlayer").play("move" + direction_string)
+					idle = false
 		
 		var atpos = path[path.size() - 1]
-		var collision = $Robot.move_and_collide(atpos - $Robot.position)
-		if collision:
-			# TODO: actual collisiony type things. At the minute, only portal behaviour
-			print (collision)
+		process_collsion($Robot.move_and_collide(atpos - $Robot.position))
 		
 		if path.size() < 2:
-			path = []
-			set_process(false)
-			# print("idle" + self.direction_string)
-			$Robot.get_node("Sprite/AnimationPlayer").play("idle" + self.direction_string)
-			self.idle = true
+			stop_moving()
 
 	else:
 		set_process(false)
 
+func stop_moving():
+	path = []
+	set_process(false)
+	# print("idle" + direction_string)
+	$Robot.get_node("Sprite/AnimationPlayer").play("idle" + direction_string)
+	idle = true
+
 func _update_path():
-	var p = self.get_simple_path(begin, end, true)
+	var p = get_simple_path(begin, end, true)
 	path = Array(p)
 	path.invert()
 	set_process(true)
@@ -73,7 +75,19 @@ func update_anim_string(vec):
 	if normal.x > threshold:
 		new_str += "_right"
 
-	if new_str != self.direction_string:
-		self.direction_string = new_str
+	if new_str != direction_string:
+		direction_string = new_str
 		return true
 	return false
+
+func process_collsion(collision):
+	if collision:
+		# TODO: actual collisiony type things. At the minute, only portal behaviour
+		var collider = collision.collider
+		print (collider)
+
+		if collider is Exit and collider.is_visible_in_tree():
+			# This is a collider, move the player sprite and notify the room manager
+			stop_moving()
+			get_node("../RoomManager").change_room(collider)
+

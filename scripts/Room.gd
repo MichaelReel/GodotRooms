@@ -69,12 +69,11 @@ func add_exits(exit_flags):
 	print(self.exits)
 
 
-func set_exit(exit_ind, room_x, room_y, target_exit):
+func set_exit(exit_ind, room, target_exit):
 	# Set the destination room and position
-	exits[exit_ind].room_x = room_x
-	exits[exit_ind].room_y = room_y
+	exits[exit_ind].room = room
 	# TODO: This'll likely suck for up and down connections
-	exits[exit_ind].destination = target_exit.position + exit_incursion(exit_ind)
+	exits[exit_ind].destination = target_exit.position + (exit_incursion(exit_ind) * 2)
 
 
 func get_exit_pos(i):
@@ -301,3 +300,12 @@ func populate_POIs(pois):
 		s.position = poi
 		add_child(s)
 		s.visible = true
+
+func enable_room(enable):
+	var pre = ("en" if enable else "dis")
+	print (pre, "abling room ", self)
+	visible = enable
+	for exit in exits:
+		if exit:
+			exit.set_collision_layer_bit(0, enable)
+			print (pre, "abling exit ", exit, " : ", exit.get_collision_layer_bit(0))

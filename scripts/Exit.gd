@@ -4,8 +4,7 @@ var resource
 var cellv
 
 # Set these to determine where this exit goes
-var room_x
-var room_y
+var room
 var destination
 
 func _init(resource):
