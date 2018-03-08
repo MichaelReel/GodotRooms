@@ -55,7 +55,7 @@ func add_exits(exit_flags):
 	for i in EXIT_DIRS.size():
 		var flag = int(pow(2, i))
 		if flag & exit_flags:
-			self.exits[i] = Exit.new(self.resource)
+			self.exits[i] = Exit.new(self.resource, i)
 
 			# Need to add a sprite for the exit
 			add_child(self.exits[i])
@@ -92,7 +92,7 @@ func get_exit_pos(i):
 	while get_cellv(cellv) == TileMap.INVALID_CELL and limit: 
 		cellv += inc
 		limit -= 1
-	return cellv
+	return cellv - inc
 
 func exit_start(i):
 	var cellv

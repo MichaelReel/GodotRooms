@@ -7,10 +7,10 @@ path="res://.import/points_of_interest.png-3fa81dd2cf017f16132c19de11f864a6.stex
 [deps]
 
 source_file="res://graphics/points_of_interest.png"
-source_md5="08fa567ea7c4c3336e342763df376373"
+source_md5="e780262601623583442b71d6daf518e3"
 
 dest_files=[ "res://.import/points_of_interest.png-3fa81dd2cf017f16132c19de11f864a6.stex" ]
-dest_md5="383d673a22ebd69c2aaec8dcb92d28c8"
+dest_md5="6fcf257a261aa287a367ad46c557bec5"
 
 [params]
 

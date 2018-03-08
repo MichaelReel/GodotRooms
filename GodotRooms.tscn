@@ -332,17 +332,46 @@ region_enabled = true
 region_rect = Rect2( 0, 0, 16, 16 )
 _sections_unfolded = [ "Region" ]
 
-[node name="Exit" type="Sprite" parent="RoomManager/RoomResource/SpritePool" index="1"]
+[node name="Exit_0" type="Sprite" parent="RoomManager/RoomResource/SpritePool" index="1"]
 
+visible = false
 texture = ExtResource( 4 )
 centered = false
 region_enabled = true
-region_rect = Rect2( 16, 0, 16, 16 )
+region_rect = Rect2( 0, 16, 16, 16 )
+_sections_unfolded = [ "Offset", "Region" ]
+
+[node name="Exit_1" type="Sprite" parent="RoomManager/RoomResource/SpritePool" index="2"]
+
+visible = false
+texture = ExtResource( 4 )
+centered = false
+region_enabled = true
+region_rect = Rect2( 48, 16, 16, 16 )
+_sections_unfolded = [ "Offset", "Region" ]
+
+[node name="Exit_2" type="Sprite" parent="RoomManager/RoomResource/SpritePool" index="3"]
+
+visible = false
+texture = ExtResource( 4 )
+centered = false
+region_enabled = true
+region_rect = Rect2( 32, 16, 16, 16 )
+_sections_unfolded = [ "Offset", "Region" ]
+
+[node name="Exit_3" type="Sprite" parent="RoomManager/RoomResource/SpritePool" index="4"]
+
+visible = false
+texture = ExtResource( 4 )
+centered = false
+region_enabled = true
+region_rect = Rect2( 16, 16, 16, 16 )
 _sections_unfolded = [ "Offset", "Region" ]
 
 [node name="Navigation2D" type="Navigation2D" parent="." index="1"]
 
 script = ExtResource( 5 )
+_sections_unfolded = [ "Transform" ]
 
 [node name="navpoly" type="NavigationPolygonInstance" parent="Navigation2D" index="0"]
 
@@ -369,8 +398,8 @@ limit_top = 0
 limit_right = 10000000
 limit_bottom = 10000000
 limit_smoothed = false
-drag_margin_h_enabled = true
-drag_margin_v_enabled = true
+drag_margin_h_enabled = false
+drag_margin_v_enabled = false
 smoothing_enabled = true
 smoothing_speed = 5.0
 offset_v = 0.0

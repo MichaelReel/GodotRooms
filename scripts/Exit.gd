@@ -7,11 +7,11 @@ var cellv
 var room
 var destination
 
-func _init(resource):
+func _init(resource, dir):
 	self.resource = resource
 	# Create Sprite
 	var templates = resource.get_node("SpritePool")
-	var exit_sprite = templates.get_node("Exit")
+	var exit_sprite = templates.get_node("Exit_" + str(dir))
 	var sprite = exit_sprite.duplicate()
 	sprite.visible = true
 	add_child(sprite)

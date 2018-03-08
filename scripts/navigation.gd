@@ -49,17 +49,25 @@ func stop_moving():
 	idle = true
 
 func _update_path():
+	var collider = $Robot.get_node("CollisionShape2D")
 	var p = get_simple_path(begin, end, true)
-	path = Array(p)
-	path.invert()
+	
+	path = []
+	for vert in p:
+		var mod_path = vert - collider.position
+		path.push_front(mod_path)
+
+	# path = Array(p)
+	# path.invert()
+
 	set_process(true)
 
 func _input(event):
-	var room_man = get_node("../RoomManager")
+	var collider = $Robot.get_node("CollisionShape2D")
 	if event is InputEventMouseButton and event.pressed and event.button_index == 1:
-		begin = $Robot.position
+		begin = $Robot.position + collider.position
 		# Mouse to local navigation coordinates
-		end = get_global_mouse_position() - position - (room_man.resource.tile_size / 2)
+		end = get_global_mouse_position() - position
 		_update_path()
 
 func update_anim_string(vec):
@@ -85,6 +93,7 @@ func update_anim_string(vec):
 
 func process_collsion(collision):
 	var room_man = get_node("../RoomManager")
+	var cam = $Robot.get_node("Camera2D")
 	if collision:
 		# TODO: actual collisiony type things. At the minute, only portal behaviour
 		var collider = collision.collider
@@ -93,5 +102,7 @@ func process_collsion(collision):
 		if collider is Exit and collider.is_visible_in_tree():
 			# This is a collider, move the player sprite and notify the room manager
 			stop_moving()
+			# cam.smoothing_enabled = false
 			room_man.change_room(collider)
+			# cam.smoothing_enabled = true
 
