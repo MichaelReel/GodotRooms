@@ -386,7 +386,7 @@ editor_draw_drag_margin = false
 [node name="Sprite" type="Sprite" parent="Navigation2D/Robot" index="1"]
 
 texture = ExtResource( 6 )
-offset = Vector2( 0, -8 )
+centered = false
 vframes = 8
 hframes = 8
 frame = 11
@@ -420,7 +420,7 @@ _sections_unfolded = [ "Pause", "Playback Options" ]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Navigation2D/Robot" index="2"]
 
-position = Vector2( 0, -8 )
+position = Vector2( 8, 8 )
 shape = SubResource( 18 )
 _sections_unfolded = [ "Transform" ]
 

@@ -23,4 +23,5 @@ func _init(resource):
 	collision.shape.extents = Vector2(8, 8)
 	add_child(collision)
 
-
+func details():
+	return str(self) + ": " + str(self.position)

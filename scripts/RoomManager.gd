@@ -48,17 +48,17 @@ func create_room_set():
 	# Connect rooms by exits
 	# TODO: This is still based on the above prototype
 	#TL   y  x                                   y  x         y  x
-	rooms[0][0].set_exit(Room.EXIT_BOTTOM, rooms[1][0], rooms[1][0].exits[Room.EXIT_TOP])
-	rooms[0][0].set_exit(Room.EXIT_RIGHT,  rooms[0][1], rooms[0][1].exits[Room.EXIT_LEFT])
+	rooms[0][0].set_exit(Room.EXIT_BOTTOM, rooms[1][0], Room.EXIT_TOP)
+	rooms[0][0].set_exit(Room.EXIT_RIGHT,  rooms[0][1], Room.EXIT_LEFT)
 	#TR
-	rooms[0][1].set_exit(Room.EXIT_BOTTOM, rooms[1][1], rooms[1][1].exits[Room.EXIT_TOP])
-	rooms[0][1].set_exit(Room.EXIT_LEFT,   rooms[0][0], rooms[0][0].exits[Room.EXIT_RIGHT])
+	rooms[0][1].set_exit(Room.EXIT_BOTTOM, rooms[1][1], Room.EXIT_TOP)
+	rooms[0][1].set_exit(Room.EXIT_LEFT,   rooms[0][0], Room.EXIT_RIGHT)
 	#BL
-	rooms[1][0].set_exit(Room.EXIT_TOP,    rooms[0][0], rooms[0][0].exits[Room.EXIT_BOTTOM])
-	rooms[1][0].set_exit(Room.EXIT_RIGHT,  rooms[1][1], rooms[1][1].exits[Room.EXIT_LEFT])
+	rooms[1][0].set_exit(Room.EXIT_TOP,    rooms[0][0], Room.EXIT_BOTTOM)
+	rooms[1][0].set_exit(Room.EXIT_RIGHT,  rooms[1][1], Room.EXIT_LEFT)
 	#BR
-	rooms[1][1].set_exit(Room.EXIT_TOP,    rooms[0][1], rooms[0][1].exits[Room.EXIT_BOTTOM])
-	rooms[1][1].set_exit(Room.EXIT_LEFT,   rooms[1][0], rooms[1][0].exits[Room.EXIT_RIGHT])
+	rooms[1][1].set_exit(Room.EXIT_TOP,    rooms[0][1], Room.EXIT_BOTTOM)
+	rooms[1][1].set_exit(Room.EXIT_LEFT,   rooms[1][0], Room.EXIT_RIGHT)
 	
 	for ry in ry_limit + 1:
 		for rx in rx_limit + 1:

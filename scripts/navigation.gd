@@ -13,6 +13,7 @@ var direction_string = "_down"
 var idle = true
 
 func _process(delta):
+	var robot_anim = $Robot.get_node("Sprite/AnimationPlayer")
 	if path.size() > 1:
 		var to_walk = delta * SPEED
 		while to_walk > 0 and path.size() >= 2:
@@ -27,7 +28,7 @@ func _process(delta):
 				to_walk = 0
 				if update_anim_string(pto - pfrom) or idle:
 					# print("move" + direction_string)
-					$Robot.get_node("Sprite/AnimationPlayer").play("move" + direction_string)
+					robot_anim.play("move" + direction_string)
 					idle = false
 		
 		var atpos = path[path.size() - 1]
@@ -40,10 +41,11 @@ func _process(delta):
 		set_process(false)
 
 func stop_moving():
+	var robot_anim = $Robot.get_node("Sprite/AnimationPlayer")
 	path = []
 	set_process(false)
 	# print("idle" + direction_string)
-	$Robot.get_node("Sprite/AnimationPlayer").play("idle" + direction_string)
+	robot_anim.play("idle" + direction_string)
 	idle = true
 
 func _update_path():
@@ -53,10 +55,11 @@ func _update_path():
 	set_process(true)
 
 func _input(event):
+	var room_man = get_node("../RoomManager")
 	if event is InputEventMouseButton and event.pressed and event.button_index == 1:
 		begin = $Robot.position
 		# Mouse to local navigation coordinates
-		end = get_global_mouse_position() - position
+		end = get_global_mouse_position() - position - (room_man.resource.tile_size / 2)
 		_update_path()
 
 func update_anim_string(vec):
@@ -81,6 +84,7 @@ func update_anim_string(vec):
 	return false
 
 func process_collsion(collision):
+	var room_man = get_node("../RoomManager")
 	if collision:
 		# TODO: actual collisiony type things. At the minute, only portal behaviour
 		var collider = collision.collider
@@ -89,5 +93,5 @@ func process_collsion(collision):
 		if collider is Exit and collider.is_visible_in_tree():
 			# This is a collider, move the player sprite and notify the room manager
 			stop_moving()
-			get_node("../RoomManager").change_room(collider)
+			room_man.change_room(collider)
 

@@ -55,7 +55,6 @@ func add_exits(exit_flags):
 	for i in EXIT_DIRS.size():
 		var flag = int(pow(2, i))
 		if flag & exit_flags:
-			print("Need to add exit ", EXIT_DIRS[i])
 			self.exits[i] = Exit.new(self.resource)
 
 			# Need to add a sprite for the exit
@@ -66,19 +65,25 @@ func add_exits(exit_flags):
 			var position = Vector2(cellv.x * self.tile_size.x, cellv.y * self.tile_size.y)
 			self.exits[i].position = position
 
-	print(self.exits)
+	var exit_strs = ""
+	for e in exits:
+		exit_strs += e.details() + ", " if e else str(e) + ", "
+	exit_strs = exit_strs.substr(0, exit_strs.length() - 2)
+	print(self, " has exits: ", exit_strs)
 
 
-func set_exit(exit_ind, room, target_exit):
+func set_exit(exit_ind, target_room, target_exit_ind):
 	# Set the destination room and position
-	exits[exit_ind].room = room
+	var exit = exits[exit_ind]
+	exit.room = target_room
+	var target_exit = target_room.exits[target_exit_ind]
 	# TODO: This'll likely suck for up and down connections
-	exits[exit_ind].destination = target_exit.position + (exit_incursion(exit_ind) * 2)
+	var dest_inc = exit_incursion(target_exit_ind)
+	exit.destination = target_exit.position + Vector2(dest_inc.x * tile_size.x, dest_inc.y * tile_size.y)
+	print (exit, ":", EXIT_DIRS[exit_ind], " connected to exit ", target_exit, " in room ", exit.room, " position ", exit.destination)
 
 
 func get_exit_pos(i):
-	print ("sort out ", EXIT_DIRS[i], " exit")
-	
 	var cellv = exit_start(i)
 	var inc = exit_incursion(i)
 	# add inc to start until we find a suitable tile
