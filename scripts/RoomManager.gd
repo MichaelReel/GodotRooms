@@ -1,6 +1,7 @@
 extends Node2D
 
 var Room = load("res://scripts/Room.gd")
+var Exit = load("res://scripts/Exit.gd")
 var rooms = []
 
 var resource
@@ -37,10 +38,10 @@ func create_room_set():
 		for rx in rx_limit + 1:
 			# Exit flags are (1:top, 2:bottom, 3:left, 4:right, 5: up, 6: down)
 			var exit_flag = 0
-			if ry > 0:        exit_flag |= 1 << Room.EXIT_TOP
-			if ry < ry_limit: exit_flag |= 1 << Room.EXIT_BOTTOM
-			if rx > 0:        exit_flag |= 1 << Room.EXIT_LEFT
-			if rx < rx_limit: exit_flag |= 1 << Room.EXIT_RIGHT
+			if ry > 0:        exit_flag |= 1 << Exit.EXIT_TOP
+			if ry < ry_limit: exit_flag |= 1 << Exit.EXIT_BOTTOM
+			if rx > 0:        exit_flag |= 1 << Exit.EXIT_LEFT
+			if rx < rx_limit: exit_flag |= 1 << Exit.EXIT_RIGHT
 			var new_room = Room.new(resource, exit_flag, randi())
 			rooms[ry].append(new_room)
 			add_child(new_room, true)
@@ -48,17 +49,17 @@ func create_room_set():
 	# Connect rooms by exits
 	# TODO: This is still based on the above prototype
 	#TL   y  x                                   y  x         y  x
-	rooms[0][0].set_exit(Room.EXIT_BOTTOM, rooms[1][0], Room.EXIT_TOP)
-	rooms[0][0].set_exit(Room.EXIT_RIGHT,  rooms[0][1], Room.EXIT_LEFT)
+	rooms[0][0].set_exit(Exit.EXIT_BOTTOM, rooms[1][0], Exit.EXIT_TOP)
+	rooms[0][0].set_exit(Exit.EXIT_RIGHT,  rooms[0][1], Exit.EXIT_LEFT)
 	#TR
-	rooms[0][1].set_exit(Room.EXIT_BOTTOM, rooms[1][1], Room.EXIT_TOP)
-	rooms[0][1].set_exit(Room.EXIT_LEFT,   rooms[0][0], Room.EXIT_RIGHT)
+	rooms[0][1].set_exit(Exit.EXIT_BOTTOM, rooms[1][1], Exit.EXIT_TOP)
+	rooms[0][1].set_exit(Exit.EXIT_LEFT,   rooms[0][0], Exit.EXIT_RIGHT)
 	#BL
-	rooms[1][0].set_exit(Room.EXIT_TOP,    rooms[0][0], Room.EXIT_BOTTOM)
-	rooms[1][0].set_exit(Room.EXIT_RIGHT,  rooms[1][1], Room.EXIT_LEFT)
+	rooms[1][0].set_exit(Exit.EXIT_TOP,    rooms[0][0], Exit.EXIT_BOTTOM)
+	rooms[1][0].set_exit(Exit.EXIT_RIGHT,  rooms[1][1], Exit.EXIT_LEFT)
 	#BR
-	rooms[1][1].set_exit(Room.EXIT_TOP,    rooms[0][1], Room.EXIT_BOTTOM)
-	rooms[1][1].set_exit(Room.EXIT_LEFT,   rooms[1][0], Room.EXIT_RIGHT)
+	rooms[1][1].set_exit(Exit.EXIT_TOP,    rooms[0][1], Exit.EXIT_BOTTOM)
+	rooms[1][1].set_exit(Exit.EXIT_LEFT,   rooms[1][0], Exit.EXIT_RIGHT)
 	
 	for ry in ry_limit + 1:
 		for rx in rx_limit + 1:

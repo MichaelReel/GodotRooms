@@ -11,14 +11,6 @@ var limit_right
 var limit_bottom
 var templates
 
-const EXIT_TOP = 0
-const EXIT_BOTTOM = 1
-const EXIT_LEFT = 2
-const EXIT_RIGHT = 3
-const EXIT_UP = 4
-const EXIT_DOWN = 5
-
-const EXIT_DIRS = ["top", "bottom", "left", "right", "up", "down"]
 var exits = [null, null, null, null, null, null]
 var spawn
 
@@ -52,7 +44,7 @@ func _init(resource, exit_flags = 0, gen_seed = OS.get_time().second, scale = 2)
 	# setup_debug_draw()
 
 func add_exits(exit_flags):
-	for i in EXIT_DIRS.size():
+	for i in Exit.EXIT_DIRS.size():
 		var flag = int(pow(2, i))
 		if flag & exit_flags:
 			self.exits[i] = Exit.new(self.resource, i)
@@ -78,55 +70,44 @@ func set_exit(exit_ind, target_room, target_exit_ind):
 	exit.room = target_room
 	var target_exit = target_room.exits[target_exit_ind]
 	# TODO: This'll likely suck for up and down connections
-	var dest_inc = exit_incursion(target_exit_ind)
+	var dest_inc = Exit.exit_incursion(target_exit_ind)
 	exit.destination = target_exit.position + Vector2(dest_inc.x * tile_size.x, dest_inc.y * tile_size.y)
-	print (exit, ":", EXIT_DIRS[exit_ind], " connected to exit ", target_exit, " in room ", exit.room, " position ", exit.destination)
+	print (exit, ":", Exit.EXIT_DIRS[exit_ind], " connected to exit ", target_exit, " in room ", exit.room, " position ", exit.destination)
 
 
 func get_exit_pos(i):
-	var cellv = exit_start(i)
-	var inc = exit_incursion(i)
+	var cellv = Exit.exit_start(i, room_size)
+	var inc = Exit.exit_incursion(i)
 	# add inc to start until we find a suitable tile
 	# TODO: This likely sucks for UP and DOWN portals
 	var limit = 10
+
+	# Move into the map until the walkable area is reached
 	while get_cellv(cellv) == TileMap.INVALID_CELL and limit: 
 		cellv += inc
 		limit -= 1
-	return cellv - inc
 
-func exit_start(i):
-	var cellv
-	match i:
-		EXIT_TOP:
-			cellv = Vector2(int(room_size.x / 2), 0)
-		EXIT_BOTTOM:
-			cellv = Vector2(int(room_size.x / 2), room_size.y)
-		EXIT_LEFT:
-			cellv = Vector2(0, int(room_size.y / 2))
-		EXIT_RIGHT:
-			cellv = Vector2(room_size.x, int(room_size.y / 2))
-		EXIT_UP:
-			cellv = Vector2(int(room_size.x / 2), int(room_size.y / 2) - 1)
-		EXIT_DOWN:
-			cellv = Vector2(int(room_size.x / 2), int(room_size.y / 2) + 1)
+	# Move back one cell into the wall
+	cellv -= inc
+
+	# If there is a non-wall cell to either side, shuffle back
+	var perpend1 = get_cellv(cellv + Vector2(inc.y, -inc.x)) != TileMap.INVALID_CELL
+	var perpend2 = get_cellv(cellv + Vector2(-inc.y, inc.x)) != TileMap.INVALID_CELL
+	while perpend1 || perpend2:
+		if perpend1:
+			cellv += Vector2(inc.y, -inc.x)
+		else:
+			cellv += Vector2(-inc.y, inc.x)
+
+		# Move back to the nearest wall
+		while get_cellv(cellv) != TileMap.INVALID_CELL:
+			cellv -= inc
+
+		# Check the cells to either side again
+		perpend1 = get_cellv(cellv + Vector2(inc.y, -inc.x)) != TileMap.INVALID_CELL
+		perpend2 = get_cellv(cellv + Vector2(-inc.y, inc.x)) != TileMap.INVALID_CELL
+	
 	return cellv
-
-func exit_incursion(i):
-	var inc
-	match i:
-		EXIT_TOP:
-			inc = Vector2(0, 1)
-		EXIT_BOTTOM:
-			inc = Vector2(0, -1)
-		EXIT_LEFT:
-			inc = Vector2(1, 0)
-		EXIT_RIGHT:
-			inc = Vector2(-1, 0)
-		EXIT_UP:
-			inc = Vector2(0, -1)
-		EXIT_DOWN:
-			inc = Vector2(0, 1)
-	return inc
 
 # scale should be no less than 2
 func draw_path(baseLayout, scale, path_tile):
