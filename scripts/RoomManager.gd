@@ -10,6 +10,7 @@ var current_room
 var nav_node
 var player_node
 var cam_node
+var overlay
 
 func _ready():
 	print("readying room manager")
@@ -23,6 +24,7 @@ func _ready():
 	nav_node    = get_node("../Navigation2D/navpoly")
 	player_node = get_node("../Navigation2D/Robot")
 	cam_node    = get_node("../Navigation2D/Robot/Camera2D")
+	overlay     = cam_node.get_node("TransitionOverlay")
 	
 	create_room_set()
 
@@ -70,7 +72,10 @@ func create_room_set():
 	set_current_room(new_room, new_room.spawn)
 
 func set_current_room(room, entrance):
-	print (current_room, "->", room)
+	# Setup overlay transition
+	overlay.setup_transition()
+
+	# Change the current room
 	if current_room: current_room.enable_room(false)
 	current_room = room
 	current_room.enable_room(true)
