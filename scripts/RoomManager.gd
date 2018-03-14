@@ -24,7 +24,7 @@ func _ready():
 	nav_node    = get_node("../Navigation2D/navpoly")
 	player_node = get_node("../Navigation2D/Robot")
 	cam_node    = get_node("../Navigation2D/Robot/Camera2D")
-	overlay     = cam_node.get_node("TransitionOverlay")
+	overlay     = get_node("../TransitionOverlay")
 	
 	create_room_set()
 
@@ -65,15 +65,16 @@ func create_room_set():
 	
 	for ry in ry_limit + 1:
 		for rx in rx_limit + 1:
-			rooms[ry][rx].enable_room(false)
+			rooms[ry][rx].enable_room(false, 0)
+			print("[", ry, "][", rx, "] = ", rooms[ry][rx])
 
 	# Set starting room:
 	var new_room = rooms[0][0]
-	set_current_room(new_room, new_room.spawn)
+	set_current_room(new_room, new_room.spawn, Vector2())
 
-func set_current_room(room, entrance):
+func set_current_room(room, entrance, dir):
 	# Setup overlay transition
-	overlay.setup_transition()
+	overlay.setup_transition(dir, cam_node)
 
 	# Change the current room
 	if current_room: current_room.enable_room(false)
@@ -95,4 +96,18 @@ func set_current_room(room, entrance):
 func change_room(exit):
 	var room = exit.room
 	var entrance = exit.destination
-	set_current_room(room, entrance)
+	var dir = exit.dir_v
+	set_current_room(room, entrance, dir)
+
+# var debug_timer = 1.0
+
+# func _process(delta):
+# 	debug_timer -= delta
+# 	if debug_timer <= 0.0:
+# 		var active_cam = cam_node
+# 		var over_cam = overlay.get_node("Camera2D")
+# 		if over_cam and over_cam.current: active_cam = over_cam
+# 		print ("debug_timer: ", debug_timer)
+# 		print ("Camera position: ", active_cam.get_camera_position())
+# 		print ("Camera screen center: ", active_cam.get_camera_screen_center())
+# 		debug_timer += 1.0

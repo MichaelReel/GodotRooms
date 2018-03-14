@@ -1,44 +1,37 @@
-extends Sprite
+extends Camera2D
 
-const solid_time = 1.0
-const fade_time = 2.0
+var robot_cam
 
-var solid_var
-var fade_var
-var cam_node
+var time_out
+var tot_time
 
-func setup_transition():
-	cam_node = get_node("..")
+# func _ready():
+# 	set_process(false)
 
-	# Take a screenshot of the current scene
-	var viewport = get_tree().get_root()
-	var screenshot = ImageTexture.new()
-	screenshot.create_from_image(viewport.get_texture().get_data())
+func setup_transition(out_dir, main_cam, total_time = 2.0):
+	robot_cam = main_cam
 
-	# Set the texure
-	set_texture(screenshot)
-	scale = cam_node.zoom
-	visible = true
+	# Set this sprites position to exit
+	position = robot_cam.get_camera_screen_center()
+	make_current()
 
-	# Start the fade process
-	solid_var = solid_time
-	fade_var = fade_time
+	# Give a second or so
+	tot_time = total_time
+	time_out = total_time
+
 	set_process(true)
 
 func _process(delta):
-	# Work through the solid time
-	solid_var -= delta
-	if solid_var <= 0.0:
-		# Solid time up, fade time now
-		fade_var += solid_var
-		solid_var = 0.0
+	time_out -= delta
 
-	# Set the fading alpha value
-	var alpha = fade_var / fade_time
-	modulate = Color(1.0, 1.0, 1.0, alpha)
+	robot_cam.align()
+	robot_cam.reset_smoothing()
 
-	if fade_var <= 0.0:
-		visible = false
+	if time_out <= tot_time / 2:
+		position = robot_cam.get_camera_screen_center()
+
+	if time_out <= 0:
+		robot_cam.make_current()
 		set_process(false)
 
 

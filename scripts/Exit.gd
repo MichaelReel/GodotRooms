@@ -15,6 +15,7 @@ var cellv
 # Set these to determine where this exit goes
 var room
 var destination
+var dir_v
 
 func _init(resource, dir, tile_size = Vector2(16, 16)):
 	self.resource = resource
@@ -31,6 +32,8 @@ func _init(resource, dir, tile_size = Vector2(16, 16)):
 	# collision.shape = RectangleShape2D.new()
 	# collision.shape.extents = Vector2(8, 8)
 	add_child(create_collider(dir, tile_size) )
+	var inc_v = exit_incursion(dir)
+	dir_v = Vector2(-inc_v.x, -inc_v.y)
 
 func details():
 	return str(self) + ": " + str(self.position)

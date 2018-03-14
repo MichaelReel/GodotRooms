@@ -287,11 +287,39 @@ func populate_POIs(pois):
 		add_child(s)
 		s.visible = true
 
-func enable_room(enable):
+func enable_room(enable, time=2.0):
 	var pre = ("en" if enable else "dis")
 	print (pre, "abling room ", self)
-	visible = enable
 	for exit in exits:
 		if exit:
 			exit.set_collision_layer_bit(0, enable)
-			print (pre, "abling exit ", exit, " : ", exit.get_collision_layer_bit(0))
+			 # print (pre, "abling exit ", exit, " : ", exit.get_collision_layer_bit(0))
+	fade_room(enable, time)
+
+var fade_time
+var fade_left
+var fade_in
+
+func fade_room(f_in, time):
+	print ("Starting fade: in:", f_in, ", time: ", time)
+	fade_time = time
+	fade_left = time
+	fade_in = f_in
+	set_process(true)
+
+func _process(delta):
+	var alpha = 1.0
+	if fade_time:
+		if fade_in:
+			alpha = 1.0 - (fade_left / fade_time)
+		else:
+			alpha = 0.0 + (fade_left / fade_time)
+
+	fade_left -= delta
+	if fade_left <= 0:
+		visible = fade_in
+		set_process(false)
+	else:
+		visible = true
+		modulate.a = alpha
+
