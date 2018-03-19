@@ -17,14 +17,19 @@ var tile_size
 
 var walls
 var stairs
+var pits
 var base_fbm
 
 func _ready():
 	self.tile_size = self.tileset.tile_get_region(1).size
-	
+
 	self.walls = {}
 	for i in range(16):
 		self.walls[i] = self.tileset.find_tile_by_name("wall_%02d" % i)
+
+	self.pits = {}
+	for i in range(16):
+		self.pits[i] = self.tileset.find_tile_by_name("pit_%02d" % i)
 	
 	self.stairs = {}
 	for i in [3, 5, 10, 12]:

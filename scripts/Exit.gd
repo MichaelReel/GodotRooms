@@ -38,7 +38,7 @@ func _init(resource, dir, tile_size = Vector2(16, 16)):
 func details():
 	return str(self) + ": " + str(self.position)
 
-func exit_start(i, room_size):
+static func exit_start(i, room_size):
 	var cellv
 	match i:
 		EXIT_TOP:
@@ -55,7 +55,7 @@ func exit_start(i, room_size):
 			cellv = Vector2(int(room_size.x / 2), int(room_size.y / 2) + 1)
 	return cellv
 
-func exit_incursion(i):
+static func exit_incursion(i):
 	var inc
 	match i:
 		EXIT_TOP:
