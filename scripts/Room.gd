@@ -287,23 +287,24 @@ func populate_POIs(pois):
 		add_child(s)
 		s.visible = true
 
-func enable_room(enable, time=2.0):
+func enable_room(enable, time):
 	var pre = ("en" if enable else "dis")
 	print (pre, "abling room ", self)
 	for exit in exits:
 		if exit:
 			exit.set_collision_layer_bit(0, enable)
 			 # print (pre, "abling exit ", exit, " : ", exit.get_collision_layer_bit(0))
-	fade_room(enable, time)
+	var delay = time if enable else 0.0
+	fade_room(enable, time, delay)
 
 var fade_time
 var fade_left
 var fade_in
 
-func fade_room(f_in, time):
+func fade_room(f_in, time, delay):
 	print ("Starting fade: in:", f_in, ", time: ", time)
 	fade_time = time
-	fade_left = time
+	fade_left = time + delay
 	fade_in = f_in
 	set_process(true)
 
@@ -311,9 +312,9 @@ func _process(delta):
 	var alpha = 1.0
 	if fade_time:
 		if fade_in:
-			alpha = 1.0 - (fade_left / fade_time)
+			alpha = 1.0 - min(fade_left / fade_time, 1.0)
 		else:
-			alpha = 0.0 + (fade_left / fade_time)
+			alpha = 0.0 + min(fade_left / fade_time, 1.0)
 
 	fade_left -= delta
 	if fade_left <= 0:

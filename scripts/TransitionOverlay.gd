@@ -8,7 +8,7 @@ var tot_time
 # func _ready():
 # 	set_process(false)
 
-func setup_transition(out_dir, main_cam, total_time = 2.0):
+func setup_transition(out_dir, main_cam, total_time):
 	robot_cam = main_cam
 
 	# Set this sprites position to exit

@@ -74,12 +74,13 @@ func create_room_set():
 
 func set_current_room(room, entrance, dir):
 	# Setup overlay transition
-	overlay.setup_transition(dir, cam_node)
+	var fade_time = 0.2
+	overlay.setup_transition(dir, cam_node, fade_time)
 
 	# Change the current room
-	if current_room: current_room.enable_room(false)
+	if current_room: current_room.enable_room(false, fade_time)
 	current_room = room
-	current_room.enable_room(true)
+	current_room.enable_room(true, fade_time)
 
 	# Get the navigation for the room
 	nav_node.navpoly = current_room.nav
