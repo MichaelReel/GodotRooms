@@ -124,7 +124,47 @@ func draw_path(baseLayout, scale, path_tile):
 					for rx in range(dest_cell.position.x, dest_cell.end.x):
 							self.set_cell(rx, ry, path_tile)
 
+func create_poly_types():
+	# Assign tile sets to each group of polygons
+	# ( This mixes up nav polys and tile sets
+	#   and will probably cause hassle later )
+
+	var outline_mappings = []
+	for i in self.nav.get_outline_count():
+		outline_mappings.append({})
+		outline_mappings[i]['collider'] = ConcavePolygonShape2D.new()
+		outline_mappings[i]['collider'].segments = self.nav.get_outline(i)
+		outline_mappings[i]['tile_group'] = self.resource.walls
+		if randi() % 2 == 0:
+			outline_mappings[i]['tile_group'] = self.resource.pits
+
+	# Take off the outer polygon, everything is inside
+	outline_mappings.pop_front()
+	return outline_mappings
+
+func find_point_in_polys(cellv, outline_mappings):
+	var id_matrix = Transform2D()
+	var tile_group = self.resource.walls
+	var cell_shape = RectangleShape2D.new()
+	cell_shape.extents = resource.tile_size
+	var cell_pos = Vector2(cellv.x * resource.tile_size.x, cellv.y * resource.tile_size.y) + resource.tile_size / 2
+	var cell_matrix = Transform2D(0, cell_pos)
+
+
+	for i in outline_mappings.size():
+		var outline_map = outline_mappings[i]
+		# If the given cell is within the polygon,
+		# return that polygon's tile_group
+		if outline_map['collider'].collide(id_matrix, cell_shape, cell_matrix):
+			tile_group = outline_map['tile_group']
+			break
+
+	return tile_group
+
 func draw_walls(baseLayout, scale, path_tile):
+	var outline_mappings = create_poly_types()
+	print (outline_mappings)
+
 	for y in self.room_size.y:
 		for x in self.room_size.x:
 			var dest_cell = Vector2(x, y)
@@ -132,7 +172,8 @@ func draw_walls(baseLayout, scale, path_tile):
 			if get_cellv(dest_cell) == TileMap.INVALID_CELL:
 				var score = get_corner_scores(self, dest_cell, path_tile)
 				if score == 0: continue
-				self.set_cellv(dest_cell, self.resource.walls[score])
+				var tile_group = find_point_in_polys(dest_cell, outline_mappings)
+				self.set_cellv(dest_cell, tile_group[score])
 
 
 func create_navigation(scale):
