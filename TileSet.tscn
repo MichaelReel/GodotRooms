@@ -2,7 +2,7 @@
 
 [ext_resource path="res://graphics/tiles.png" type="Texture" id=1]
 
-[node name="Node2D" type="Node2D"]
+[node name="Node2D" type="Node2D" index="0"]
 
 [node name="wall_14" type="Sprite" parent="." index="0"]
 
@@ -57,7 +57,7 @@ region_enabled = true
 region_rect = Rect2( 0, 16, 16, 16 )
 _sections_unfolded = [ "Region", "Transform" ]
 
-[node name="wall_00" type="Sprite" parent="." index="6"]
+[node name="wall_15" type="Sprite" parent="." index="6"]
 
 position = Vector2( 16, 16 )
 texture = ExtResource( 1 )
@@ -264,7 +264,16 @@ region_enabled = true
 region_rect = Rect2( 0, 112, 16, 16 )
 _sections_unfolded = [ "Region", "Transform" ]
 
-[node name="pit_05" type="Sprite" parent="." index="29"]
+[node name="pit_00" type="Sprite" parent="." index="29"]
+
+position = Vector2( 96, 16 )
+texture = ExtResource( 1 )
+centered = false
+region_enabled = true
+region_rect = Rect2( 16, 112, 16, 16 )
+_sections_unfolded = [ "Region", "Transform" ]
+
+[node name="pit_05" type="Sprite" parent="." index="30"]
 
 position = Vector2( 112, 16 )
 texture = ExtResource( 1 )
@@ -273,7 +282,7 @@ region_enabled = true
 region_rect = Rect2( 32, 112, 16, 16 )
 _sections_unfolded = [ "Region", "Transform" ]
 
-[node name="pit_04" type="Sprite" parent="." index="30"]
+[node name="pit_04" type="Sprite" parent="." index="31"]
 
 position = Vector2( 128, 16 )
 texture = ExtResource( 1 )
@@ -282,7 +291,7 @@ region_enabled = true
 region_rect = Rect2( 48, 112, 16, 16 )
 _sections_unfolded = [ "Region", "Transform" ]
 
-[node name="pit_08" type="Sprite" parent="." index="31"]
+[node name="pit_08" type="Sprite" parent="." index="32"]
 
 position = Vector2( 144, 16 )
 texture = ExtResource( 1 )
@@ -291,7 +300,7 @@ region_enabled = true
 region_rect = Rect2( 64, 112, 16, 16 )
 _sections_unfolded = [ "Region", "Transform" ]
 
-[node name="pit_11" type="Sprite" parent="." index="32"]
+[node name="pit_11" type="Sprite" parent="." index="33"]
 
 position = Vector2( 80, 32 )
 texture = ExtResource( 1 )
@@ -300,7 +309,7 @@ region_enabled = true
 region_rect = Rect2( 0, 128, 16, 16 )
 _sections_unfolded = [ "Region", "Transform" ]
 
-[node name="pit_03" type="Sprite" parent="." index="33"]
+[node name="pit_03" type="Sprite" parent="." index="34"]
 
 position = Vector2( 96, 32 )
 texture = ExtResource( 1 )
@@ -309,7 +318,7 @@ region_enabled = true
 region_rect = Rect2( 16, 128, 16, 16 )
 _sections_unfolded = [ "Region", "Transform" ]
 
-[node name="pit_07" type="Sprite" parent="." index="34"]
+[node name="pit_07" type="Sprite" parent="." index="35"]
 
 position = Vector2( 112, 32 )
 texture = ExtResource( 1 )

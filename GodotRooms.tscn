@@ -309,7 +309,7 @@ custom_solver_bias = 0.0
 extents = Vector2( 8, 8 )
 _sections_unfolded = [ "Resource" ]
 
-[node name="Root" type="Node2D" index="0"]
+[node name="Root" type="Node2D"]
 
 [node name="RoomManager" type="Node2D" parent="." index="0"]
 

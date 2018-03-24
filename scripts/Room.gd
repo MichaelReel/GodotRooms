@@ -32,7 +32,7 @@ func _init(resource, exit_flags = 0, gen_seed = OS.get_time().second, scale = 2)
 	self.set_cell_size(self.tile_size)
 	var baseLayout = BaseLayout.new(self.base_size, gen_seed)
 
-	var path_tile = resource.walls[0]
+	var path_tile = resource.walls[15]
 	draw_path(baseLayout, scale, path_tile)
 	add_exits(exit_flags)
 	create_navigation(scale)
@@ -143,6 +143,8 @@ func create_poly_types():
 	return outline_mappings
 
 func find_point_in_polys(cellv, outline_mappings):
+	# This is unfortunately not good enough to detect tiles that
+	# are completely internal - only edge collisions matter
 	var id_matrix = Transform2D()
 	var tile_group = self.resource.walls
 	var cell_shape = RectangleShape2D.new()
@@ -153,7 +155,7 @@ func find_point_in_polys(cellv, outline_mappings):
 
 	for i in outline_mappings.size():
 		var outline_map = outline_mappings[i]
-		# If the given cell is within the polygon,
+		# If the given cell is colliding with the polygon,
 		# return that polygon's tile_group
 		if outline_map['collider'].collide(id_matrix, cell_shape, cell_matrix):
 			tile_group = outline_map['tile_group']
@@ -165,15 +167,26 @@ func draw_walls(baseLayout, scale, path_tile):
 	var outline_mappings = create_poly_types()
 	print (outline_mappings)
 
+	var filler_group = null
+
 	for y in self.room_size.y:
 		for x in self.room_size.x:
 			var dest_cell = Vector2(x, y)
 			# Score and set walls
 			if get_cellv(dest_cell) == TileMap.INVALID_CELL:
 				var score = get_corner_scores(self, dest_cell, path_tile)
-				if score == 0: continue
+				# If we're in a filler group, insert filler tile
+				if filler_group && score == 0:
+					self.set_cellv(dest_cell, filler_group[0])
+					continue
+				# Otherwise, get the tilegroup we're in and set the tile
 				var tile_group = find_point_in_polys(dest_cell, outline_mappings)
 				self.set_cellv(dest_cell, tile_group[score])
+				# Starting/stopping a filler group
+				if [2, 8, 10].has(score):
+					filler_group = tile_group
+				if [1, 4, 5].has(score):
+					filler_group = null
 
 
 func create_navigation(scale):
@@ -265,6 +278,7 @@ func travel(last_cell, path_tile):
 
 var adjoining = [Vector2(1,1), Vector2(-1,1), Vector2(1,-1), Vector2(-1,-1), Vector2(0,1), Vector2(1,0), Vector2(-1,0), Vector2(0,-1)]
 var scorings = {
+	15: [4,5,6,7],
 	14: [6,7], # 3 is optional
 	13: [5,7], # 2 is optional
 	12: [7],   # 2,3 are optional
